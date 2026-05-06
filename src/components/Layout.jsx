@@ -18,8 +18,7 @@ const Layout = () => {
     <div>
       {/* This is our nav that will be visible and clickable on *EVERY* page */}
       <nav>
-        <Link to="/">Home</Link>
-        <Link to="/collection">My Collection</Link>
+        <Link to="/">My Collection</Link>
         <Link to="/create">Create Custom Card</Link>
         <form onSubmit={handleSubmit}>
           <input type='text' onChange={(e) => setSearchTerm(e.target.value)} />
