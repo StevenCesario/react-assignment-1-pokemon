@@ -1,0 +1,1 @@
+* inCollection boolean state on card in detailed view page
