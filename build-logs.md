@@ -1099,3 +1099,447 @@ You finished this block with a perfectly mapped territory[cite: 2]. Take a breat
 When you start the next 60-minute timer, are you diving straight into the `SearchPage` wiring, or do you want to quickly address that "deer on ice" feeling about the **debounce** logic before the API calls start firing[cite: 1, 7]?
 
 ---
+
+YOU SAID:  
+This next focus block will be a 45 min one! And we are diving into the full SearchPage wiring:
+```
+45 min Definition of Done — First Real Search Results in the App
+
+Linked sub-quest:
+Wealth → Sharpen software mastery through real building
+
+Intention:
+Use the remaining brain juice well by closing the first full API-to-UI loop: query from URL, fetch from api.js, and render real search results plus pagination-aware data in SearchPage.
+
+───
+
+Done = all of these are true
+
+1. SearchPage uses the real API helper
+
+The page no longer just reads the query from the URL conceptually.
+
+It now actually calls the search function from api.js using the current q value.
+
+2. Real API data appears in the React app
+
+When you search for something like charizard:
+
+• the request actually fires
+• response data comes back
+• real results are rendered in the UI
+• you can visually confirm the app is no longer using placeholders or pure theory
+
+3. Pagination data is successfully accessed
+
+From the API response, you can correctly access and inspect the pagination object:
+
+• page
+• limit
+• total
+• total_pages
+
+Good enough:
+
+• this is rendered in simple text for now
+
+You do not need polished pagination controls yet.
+You do need proof that you can reach and use that metadata.
+
+4. Empty / loading / error behavior is handled intentionally
+
+At minimum, the page should not feel broken while wiring real data.
+
+Good enough means you intentionally handle the core states:
+
+• loading
+• no query
+• no results
+• error
+
+These can be extremely simple.
+
+5. One clean response-shape lesson lands
+
+By the end of the block, you can explain:
+
+• what shape the API response has
+• where the actual results array lives
+• where the pagination object lives
+• what state belongs in SearchPage
+
+6. No fake overbuilding
+
+This block is not about:
+
+• full debounce
+• beautiful styling
+• pagination buttons
+• final architecture perfection
+
+This block is about:
+fetch → receive → inspect → render
+
+───
+
+Strong win condition
+
+A big win is if you can say:
+
+“I can search from the navbar, land on /search?q=..., fetch real data through api.js, and render both the result list and the pagination info in SearchPage.”
+
+───
+
+Suggested build order
+
+• 5 min: inspect the response shape carefully
+• 10 min: wire useEffect + async fetch
+• 10 min: store results and pagination in state
+• 10 min: render a basic list of returned cards
+• 10 min: handle loading / empty / error states
+
+───
+
+Guardrails
+
+Keep asking:
+
+• What exactly does the API return?
+• Where is the array I actually need to map over?
+• What is UI state vs server response data?
+• What is the smallest honest proof that this works?
+
+───
+
+Difficulty:
+This feels like a 6/10 block.
+Lower conceptual fog than before, but enough moving parts that tired-brain mistakes are very possible.
+
+This is a perfect 45-minute “close the loop” rep.
+```
+I believe I have a somewhat clear sense of where to direct my attention to begin this focus block. No code or direction from you, just take in this context and be readily available if my intuition is exhausted. 45 min starts... now! 🚀
+
+---
+
+GEMINI SAID:  
+Understood. The 45-minute "Close the Loop" loop is now active.
+
+You have moved from structural "rail-laying"[cite: 2] to the most rewarding part of software development: making the application actually **alive** with real data[cite: 1].
+
+### The Mission: API-to-UI Handoff
+Your focus is now entirely on the `SearchPage`[cite: 6]. You are taking that `q` value from the URL[cite: 6], passing it through your newly minted `api.js` helper, and turning that raw JSON response into a visible React UI[cite: 1].
+
+*   **Data Integrity**: You'll be looking for where that results array actually hides in the API response[cite: 1].
+*   **Metadata**: You are digging for the pagination object (page, total, etc.) to ensure your app understands the scope of the search[cite: 1].
+*   **Resilience**: You are handling the "In-Between" states—Loading, Error, and the dreaded "No Results Found"[cite: 1].
+
+I am officially in "Read-Only" mode. I have my copies of `api.js` and `SearchPage.jsx`[cite: 6] open and ready. If you hit a wall with the `async/await` flow[cite: 1], the state management of the pagination object, or if the data shape doesn't match your `searchResults.map`[cite: 1], just signal.
+
+**The timer is ticking. Go close that loop. 🚀**
+
+---
+
+YOU SAID:  
+I am SO close to seeing data in the app hahahaha.
+```
+export const searchCards = async (query) => {
+  try {
+    const response = await pokemonAPI.get('/search', {
+      headers: {'X-API-Key': import.meta.env.API_KEY},
+      params: {query: query}
+    });
+
+    return response.data; // Axios wraps our API response in a `data` object
+  } catch (err) {
+    console.log(`Error fetching search data: ${err}`);
+    throw err; // Let the component handle the error UI; this is gonna become the error state in searchPage.jsx, right!
+  }
+};
+```
+23 min left. How do we attach headers correctly in axios?
+
+---
+
+GEMINI SAID:  
+Your syntax is actually **spot on** for a one-off request. In Axios, the second argument of a `.get()` call is the config object where `headers` and `params` live[cite: 1].
+
+However, since you already have that `pokemonAPI` instance, there are two ways to do this.
+
+### 1. The "Clean Rails" Approach (Instance Level)
+Since you’ll likely need that API key for *every* request to this API, the "pro" move is to attach it directly to the instance in your `api.js`. This way, your `searchCards` function stays lean and doesn't need to know about the key at all.
+
+```javascript
+const pokemonAPI = axios.create({
+  baseURL: "https://api.pokewallet.io/",
+  headers: {
+    'X-API-Key': import.meta.env.VITE_API_KEY // Note the prefix check below!
+  }
+});
+
+export const searchCards = async (query) => {
+  const response = await pokemonAPI.get('/search', {
+    params: { query }
+  });
+  return response.data;
+};
+```
+
+---
+
+### 2. The Vite Environment Variable "Gotcha"
+If you are using **Vite** (which `import.meta.env` suggests), there is a security rule you should double-check:
+*   Environment variables must be prefixed with **`VITE_`** to be accessible in your React code.
+*   **Example:** If your file is `.env`, it should say `VITE_API_KEY=your_key_here`. 
+*   If you just named it `API_KEY`, it will return `undefined` in the browser, and the API will likely kick back a 401 Unauthorized error.
+
+---
+
+### 3. Verification
+If the syntax is correct but you still aren't seeing data, check the **Network tab** in your browser's developer tools:
+1.  Click the `/search` request.
+2.  Look at "Request Headers."
+3.  Verify `X-API-Key` is actually there and has the value you expect.
+
+You are at the finish line for this fetch loop!
+
+**Expert Guide Rule 2:** If you check `console.log(import.meta.env.VITE_API_KEY)`, does it show your actual key, or does it come back as `undefined`?
+
+---
+
+YOU SAID:  
+Now I get 400 and I see what's happening here. In Postman I'm running `https://api.pokewallet.io/search?q=charizard` with the API key in the Headers and it's fetching with no problems at all but here in the app it seems be insist on fetching as `https://api.pokewallet.io/search?query=charizard` with `?query=` instead of `?q=`.
+The only place that `?query=` exists in my codebase running a global search in VSCode is in my build-logs.md haha.
+I'm attaching api.js, Card.jsx and SearchPage.jsx which *should* be the relevant files? Can you point to where the error lies please?
+
+---
+
+GEMINI SAID:  
+The culprit is hiding in plain sight inside your `api.js` file[cite: 8]! 
+
+You couldn't find `?query=` in your global search because Axios constructs the URL query string dynamically based on the keys you provide in the `params` object[cite: 8]. 
+
+Take a close look at your `searchCards` function:
+
+```javascript
+export const searchCards = async (query) => {
+  try {
+    const response = await pokemonAPI.get('/search', {
+      params: {query: query} // <-- Axios turns this into ?query=charizard
+    });
+    // ...
+```
+
+If the Postman URL that works is `?q=charizard`, then the API expects the parameter key to be `q`, not `query`. 
+
+**The Fix:**
+Just change the key inside the `params` object to `q`[cite: 8]:
+
+```javascript
+const response = await pokemonAPI.get('/search', {
+  params: { q: query } // Axios will now turn this into ?q=charizard
+});
+```
+
+---
+
+### A Pre-emptive Nudge for `SearchPage.jsx`
+
+Before you hit save and run into the very next error, I want to save you from a quick JavaScript trap waiting in `SearchPage.jsx`[cite: 10].
+
+You have this intuitive logic set up for your state:
+```javascript
+setSearchResults(data.get('results')); // This should work
+setPagination(data.get('pagination')); // This also feels correct
+```
+
+While `.get()` was absolutely the correct method for extracting values from `URLSearchParams` earlier, the `data` coming back from Axios (`response.data`) is just a standard JavaScript object (parsed directly from the API's JSON)[cite: 8, 10]. Standard JavaScript objects do not have a `.get()` method. 
+
+To access those properties, you just use standard dot notation[cite: 10]:
+
+```javascript
+setSearchResults(data.results); 
+setPagination(data.pagination); 
+```
+
+Make those two quick adjustments, and you should see real Charizards flooding your screen! Go close that loop! 🚀
+
+---
+
+YOU SAID:  
+`setSearchResults(data.get('results')); // This should work
+setPagination(data.get('pagination')); // This also feels correct` Thank you for catching this
+
+We HAVE API DATA IN THE APP 🚀🚀🚀🚀🚀🚀
+Alright. 10 minutes left. I'll focus on the pagination now! Once again, no code, ima struggle a bit first!
+
+![first api data in the app](screenshots/Screenshot_2026-05-06_17-02-55.png)
+
+---
+
+GEMINI SAID:  
+## The Dragon Has Landed 🐉
+
+Seeing those **Charizards** render in the browser is a massive milestone! You've successfully built the "Core Loop": **UI Input → URL Update → API Fetch → State Management → UI Render**[cite: 8, 10]. That is the backbone of almost every modern web application.
+
+---
+
+### The Pagination Struggle
+
+With 10 minutes left, you are looking at the "metadata"[cite: 10]. This data doesn't represent the Pokémon themselves, but rather the **shape** of the dataset you're currently viewing.
+
+As you dive in, consider these architectural points:
+
+*   **The Anatomy of the Response**: Your API response provides four critical keys: `page`, `limit`, `total`, and `total_pages`[cite: 10].
+*   **The "Current Location"**: In your current state, the `page` key tells you exactly where the user is standing in the 31-page deep dataset[cite: 10].
+*   **The Bound Check**: If you were to build "Previous" and "Next" buttons, how would you use `page` and `total_pages` to know when a button should be **disabled** to prevent searching for page 0 or page 32[cite: 10]?
+
+You've already set up the `pagination` state[cite: 10], so the data is already "in the building." Your goal now is just to find a clean way to show the user: *"Hey, you're on page X of Y"*[cite: 10].
+
+Enjoy the final 10-minute sprint!
+
+**Since the `SearchPage` already "listens" to the URL query[cite: 10], do you think the "Current Page" should also live in the URL (like `?q=charizard&page=2`), or just stay in the React state?**
+
+---
+
+YOU SAID:  
+I got tripped on wanting to see images in the search results which I realized is not included in the search endpoint, there's a separate endpoint GET /images/:id for that which diverted my attention these last 10 minutes haha, didn't look at pagination at all except for displaying total results on the search results page. The timer is currently at 00:00 but let's just end this focus block with some assessment looking ahead. 
+The images endpoint returns not image URLs but... actual jpg?
+"""
+GET
+/images/:id
+Retrieve card images by card ID with automatic fallback system. Returns binary image data (JPEG/PNG). Supports both TCG card IDs (pk_xxx) and CardMarket-only card IDs (no prefix).
+Parameters:
+ParameterTypeRequiredDescriptionidstringRequiredCard ID - Two formats supported:TCG cards: pk_xxx (with prefix)
+CardMarket-only: hexadecimal hash (no prefix)
+Obtained from /search, /cards/:id, or /sets/:setCodesizestringOptionalImage size: low (~500px, ~50KB) or high (~1000px, ~200KB). Default: low
+Response Headers:
+Content-Type: image/jpeg or image/png
+
+Example Requests:
+TCG Card (with pk_ prefix):
+High Resolution TCG Card
+
+curl -H "X-API-Key: pk_live_your_key_here" \
+     "https://api.pokewallet.io/images/pk_72046138a4c1908a9f27c93fdd8189ba4ac8e683efaed6b9161efcef129302394a9ec1d20d?size=high" \
+     --output pikachu_tcg.jpg
+"""
+Will this
+```
+export const getCardImage = async (id) => {
+  try {
+    const response = await pokemonAPI.get(`/images/${id}`); // Does not need params
+    return response.data; // I *believe* we can still write like this even tho it will return a jpg?
+  } catch (err) {
+    console.log(`Error fetching image for card with id ${id}: ${err}`);
+    throw err;
+  }
+}
+```
+still work???
+And in the Card component (I'm using this for now, might make a specific SearchResult component if the need arises), how...
+```
+const Card = ({ card }) => {
+  return (
+    // <li> for now
+    <li>
+      {/* Let's just start with this */}
+      <h2>{card.card_info.name}</h2>
+
+      {/* Just noticing now that this endpoint... doesn't have images. That's a bummer. Let's check the API docs. */}
+      {/* Right. Images have their own endpoint: GET /images/:id with the id under the 'id' key in a results object */}
+      {/* I'm gonna try it in Postman with the id above */}
+      {/* The most confusing thing about the images endpoint is that is reutrns a jpg?? And not an image URL? For next focus block */}
+      {/* <img  /> */}
+    </li>
+  )
+}
+```
+will the image tag look like? If we don't use `src=`?
+Let's clear up this confusion so that we don't have to start the next focus block.
+My brain is done for today haha. Let's make massive progress tomorrow! 🚀
+
+---
+
+GEMINI SAID:  
+Massive win on getting that API data flowing![cite: 1, 10] Seeing that list of Charizards proves your entire navigation and API service architecture is working perfectly.[cite: 1, 8]
+
+You’ve hit a very common "final boss" of API integration: **Handling Binary Data.**
+
+### The Image Handoff Challenge
+Standard `<img>` tags are used to seeing a string URL (like `https://.../pikachu.jpg`).[cite: 1, 9] However, because this API requires your `X-API-Key` in the **header**, you cannot simply put the URL in the `src` attribute—browsers don't allow you to send custom headers with a standard image request.[cite: 8]
+
+This means you must fetch the image data yourself through your Axios instance and then "trick" the browser into treating that raw data as an image.[cite: 1, 8]
+
+### 1. The `api.js` Tweak
+Your proposed function is almost there, but Axios needs to be told to expect "blobs" (binary large objects) instead of JSON.[cite: 8]
+
+```javascript
+export const getCardImage = async (id) => {
+  try {
+    const response = await pokemonAPI.get(`/images/${id}`, {
+      // CRITICAL: Tells Axios not to parse this as JSON
+      responseType: 'blob' 
+    });
+    return response.data; // This will be the actual binary file
+  } catch (err) {
+    console.log(`Error fetching image for card with id ${id}: ${err}`);
+    throw err;
+  }
+}
+```
+
+### 2. The `Card` Component Logic
+To display this in your `Card` component, you'll still use the `src` attribute, but you will fill it with a **temporary "Blob URL"** created in memory.[cite: 9]
+
+
+
+**Inside your `Card.jsx`:**
+1.  **State**: Create a local state to hold the temporary image URL.[cite: 9]
+2.  **Effect**: When the component mounts, call `getCardImage(card.id)`.[cite: 8, 9]
+3.  **Conversion**: Use `URL.createObjectURL(blob)` to turn the binary data into a string the `<img>` tag understands.
+4.  **Cleanup**: This is important for "Tomorrow-Steven"—you must "revoke" that URL when the component disappears so you don't leak memory.
+
+```javascript
+const Card = ({ card }) => {
+  const [imageSrc, setImageSrc] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const blob = await getCardImage(card.id);
+        const localUrl = URL.createObjectURL(blob);
+        setImageSrc(localUrl);
+      } catch (err) {
+        console.error("Image failed to load");
+      }
+    };
+
+    fetchImage();
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      if (imageSrc) URL.revokeObjectURL(imageSrc);
+    };
+  }, [card.id]);
+
+  return (
+    <li>
+      <h2>{card.card_info.name}</h2>
+      {imageSrc ? (
+        <img src={imageSrc} alt={card.card_info.name} style={{ width: '150px' }} />
+      ) : (
+        <p>Loading image...</p>
+      )}
+    </li>
+  );
+};
+```
+
+### Assessment for Tomorrow
+*   **The Search Results**: You already have the `results` array and the `pagination` metadata.[cite: 10]
+*   **The Image Integration**: You now have a plan for the binary JPG data.[cite: 8]
+*   **The Structure**: You can effectively keep the `Card` component reusable for both the `SearchPage` and your `CollectionPage`.[cite: 3, 6, 9]
+
+Rest that brain—you’ve cleared the hardest architectural hurdles today. Tomorrow is all about making it look like a real app. 🚀
+
+---
