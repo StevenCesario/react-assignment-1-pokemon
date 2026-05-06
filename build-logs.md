@@ -1041,3 +1041,61 @@ const SearchPage = () => {
 With 11 minutes left, do you feel ready to try wiring this logic together, or is the `async/await` syntax still feeling a bit "foggy"?
 
 ---
+
+YOU SAID:  
+Alright, this is now our api.js:
+```
+import axios from "axios";
+
+const pokemonAPI = axios.create({baseURL: "https://api.pokewallet.io/"}); // With the ACTUAL base URL, not /search, right
+
+export const searchCards = async (query) => {
+  try {
+    const response = await pokemonAPI.get('/search', {
+      params: {query: query}
+    });
+
+    return response.data; // Axios wraps our API response in a `data` object
+  } catch (err) {
+    console.log(`Error fetching search data: ${err}`);
+    throw err; // Let the component handle the error UI; this is gonna become the error state in searchPage.jsx, right!
+  }
+};
+```
+The timer just hit 00:00 so I'll wire it up to the SearchPage component in next Focus Block! 🚀
+
+---
+
+GEMINI SAID:  
+That is a clean, professional-grade `api.js`. You’ve successfully separated your "What" (the search data) from your "How" (the Axios configuration)[cite: 1]. 
+
+### Block 2 Summary: Navigation Loop & API Setup
+You have officially converted "mysterious fog" into a working architecture[cite: 2].
+
+*   **URL as State**: You've correctly identified that the URL is the "Source of Truth," making your results shareable and refresh-proof[cite: 6].
+*   **Programmatic Navigation**: Your `Layout` is now wired to "push" the user to `/search?q=...` using `useNavigate`[cite: 7].
+*   **The API Service**: Your `api.js` is isolated and ready, meaning you won't have to clutter your components with base URLs or raw `axios` calls[cite: 1].
+
+
+### Logic Check: `baseURL` vs. Endpoints
+You were spot on about the `baseURL`. Keeping it as the root domain (`[https://api.pokewallet.io/](https://api.pokewallet.io/)`) and calling `.get('/search')` inside the function is the correct way to handle multiple endpoints later[cite: 1]. If you ever need to add a `getCardById` function for your Detailed View, you’ll just call `.get('/cards')` and everything will still work[cite: 1].
+
+
+
+### Error Handling in the Component
+Regarding your question: **Yes**, by using `throw err`, the `catch` block in your `SearchPage.jsx` will be the one that actually triggers[cite: 1]. In the next block, you can wire up an `isError` state like this:
+
+```javascript
+try {
+  const data = await searchCards(query);
+  setSearchResults(data);
+} catch (err) {
+  setIsError(true); // This happens because you threw the error in api.js!
+}
+```
+
+You finished this block with a perfectly mapped territory[cite: 2]. Take a breather! 
+
+When you start the next 60-minute timer, are you diving straight into the `SearchPage` wiring, or do you want to quickly address that "deer on ice" feeling about the **debounce** logic before the API calls start firing[cite: 1, 7]?
+
+---
