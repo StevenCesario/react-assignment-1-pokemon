@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 const Layout = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Will do... something haha!
+    // Will do... something haha! To implement debounced search!
   }, [searchTerm]);
 
+  let navigate = useNavigate();
   function handleSubmit(e) {
     e.preventDefault();
-
-    // To be implemented
+    navigate(`/search?q=${searchTerm}`);
+    // setSearchTerm(''); We'll see if this is implemented or not in the final product! For now; no!
   }
 
   return (

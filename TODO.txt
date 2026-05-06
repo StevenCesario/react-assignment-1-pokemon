@@ -1,2 +1,3 @@
 * inCollection boolean state on card in detailed view page
 * Easter Egg message on `/card`
+* set up persistent state across sessions (write to a JSON file that is read on mount?)
