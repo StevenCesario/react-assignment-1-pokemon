@@ -920,3 +920,124 @@ As you dive into the "struggle" of the fetch logic, keep these foundational patt
 I’m standing by. Go get those Charizards on the screen! 🚀
 
 ---
+
+YOU SAID:  
+Right, so. I started writing this
+```
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom"
+import Card from "../components/Card";
+
+const SearchPage = () => {
+  const baseURL = "https://api.pokewallet.io/search";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchResults, setSearchResults] = useState([]);
+
+  return (
+    <div>
+      <p>Showing results for "{searchParams.get('q')}"</p>
+      <ul>
+        {/* {searchResults.map(result => < Card card={} />)} */}
+      </ul>
+    </div>
+  )
+}
+
+export default SearchPage
+```
+And then I realized.. `const baseURL = "https://api.pokewallet.io/search";` isn't gonna live here, is it? The SearchPage component is just gonna fetch a function from... api.js, isn't it? This is where our attention is gonna have to go next. Right. api.js and the axios config. This is also completely new to me. Let's have the remaining 11 minutes be me recalling my intuitive understanding from the topic of axios and you translating it to code since this is my very first time using it in code and I have no muscle memory.
+First of all, we have an api folder in src and a file called api.js? Is that the structure?
+And then on axios... Ima do my best to recall the lecture on this. Maybe I should've practiced on it the same day cuz the lecture was last week, I believe a week ago haha. But aight. 
+We have an axios config. That let's us write GET and POST api functions, right? We only need GET functionality, we won't POST to this API. So we need to write a GET search function that takes a search query as an argument? So there's gonna be *something*.get() haha. And the actual fetch with the try/catch block is gonna live inside of this function, not out in the wild in our code, it's gonna be contained within this funciton. 
+I don't remember any of the axios set up or import code so you're gonna have to provide that, let's just be efficient here. 
+This at least captures the high level idea, doesn't it? 
+
+---
+
+GEMINI SAID:  
+Your high-level intuition is spot on—extracting your API logic into a dedicated service is a "pro" move that keeps your components clean and focused solely on the UI[cite: 1]. 
+
+### 1. The Structure
+Yes, creating a `src/api/` folder with an `api.js` file is the standard industry practice for organizing these concerns. It allows you to change your base URL or add headers (like an API key) in one single place instead of hunting through ten different files.
+
+### 2. Setting Up Axios
+First, ensure you have Axios installed in your project:
+`npm install axios`[cite: 1]
+
+### 3. Implementing `api.js`
+In your `api.js`, you’ll create an **Axios instance**. Think of this as a pre-configured "messenger" that already knows where it's going and what its "house rules" are.
+
+
+
+**`src/api/api.js`**
+```javascript
+import axios from 'axios';
+
+// 1. Create a base configuration (The Axios Instance)
+const pokemonAPI = axios.create({
+  baseURL: "https://api.pokewallet.io",
+});
+
+// 2. Define your specific GET function
+export const searchCards = async (query) => {
+  try {
+    // This completes the URL to: https://api.pokewallet.io/search?query=charizard
+    const response = await pokemonAPI.get(`/search`, {
+      params: { query: query } 
+    });
+    
+    // Axios wraps the API's response in a 'data' object[cite: 1]
+    return response.data; 
+  } catch (error) {
+    console.error("Error fetching Pokémon data:", error);
+    throw error; // Let the component handle the error UI[cite: 1]
+  }
+};
+```
+
+### 4. Wiring it into `SearchPage.jsx`
+Now, the `SearchPage` just needs to call this function inside a `useEffect` whenever the URL query changes[cite: 1].
+
+**`src/pages/SearchPage.jsx`**
+```javascript
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { searchCards } from "../api/api"; // Import your new function
+
+const SearchPage = () => {
+  const [searchParams] = useSearchParams();
+  const [searchResults, setSearchResults] = useState([]);
+  const query = searchParams.get('q');
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (!query) return; // Don't fetch if there's no query string
+      
+      try {
+        const data = await searchCards(query);
+        setSearchResults(data); // Assuming the API returns an array
+      } catch (err) {
+        // Handle error state here if you want a "Something went wrong" message
+      }
+    };
+
+    fetchResults();
+  }, [query]); // Re-run whenever the 'q' in the URL changes[cite: 1]
+
+  return (
+    <div>
+      <p>Showing results for "{query}"</p>
+      {/* Map your results here! */}
+    </div>
+  );
+};
+```
+
+### Why this works:
+*   **Separation of Concerns:** `api.js` handles the "how" (axios, try/catch, base URLs), and `SearchPage` handles the "when" (useEffect based on the query)[cite: 1].
+*   **Async/Await:** Using `async/await` makes your code read like a standard top-to-bottom script, even though it's waiting for data from the internet[cite: 1].
+*   **Automatic Decoding:** Because you used `useSearchParams`, your `query` variable is already cleaned up and ready to be sent to Axios[cite: 1].
+
+With 11 minutes left, do you feel ready to try wiring this logic together, or is the `async/await` syntax still feeling a bit "foggy"?
+
+---
