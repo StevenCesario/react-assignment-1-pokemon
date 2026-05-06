@@ -20,3 +20,13 @@ export const searchCards = async (query) => {
     throw err; // Let the component handle the error UI; this is gonna become the error state in searchPage.jsx, right!
   }
 };
+
+export const getCardImage = async (id) => {
+  try {
+    const response = await pokemonAPI.get(`/images/${id}`); // Does not need params
+    return response.data; // I *believe* we can still write like this even tho it will return a jpg?
+  } catch (err) {
+    console.log(`Error fetching image for card with id ${id}: ${err}`);
+    throw err;
+  }
+}

@@ -62,6 +62,7 @@
 //       "product_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Charizard-ex-V2-sv2a185"
 //   }
 // },
+import { getCardImage } from "../api/api"
 
 const Card = ({ card }) => {
   return (
@@ -69,6 +70,12 @@ const Card = ({ card }) => {
     <li>
       {/* Let's just start with this */}
       <h2>{card.card_info.name}</h2>
+
+      {/* Just noticing now that this endpoint... doesn't have images. That's a bummer. Let's check the API docs. */}
+      {/* Right. Images have their own endpoint: GET /images/:id with the id under the 'id' key in a results object */}
+      {/* I'm gonna try it in Postman with the id above */}
+      {/* The most confusing thing about the images endpoint is that is reutrns a jpg?? And not an image URL? For next focus block */}
+      {/* <img  /> */}
     </li>
   )
 }

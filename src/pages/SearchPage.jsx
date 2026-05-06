@@ -35,9 +35,11 @@ const SearchPage = () => {
     fetchResults();
   }, [query]); // This useEffect runs whenever `q=` changes in our URL
 
+  if (error) return (<p>Error loading page: {error}</p>)
+
   return (
     <div>
-      <p>Showing results for "{query}"</p>
+      <p>Showing results for "{query}" - {pagination.total} total results</p>
 
       <ul>
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
