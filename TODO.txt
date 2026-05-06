@@ -1,1 +1,2 @@
 * inCollection boolean state on card in detailed view page
+* Easter Egg message on `/card`

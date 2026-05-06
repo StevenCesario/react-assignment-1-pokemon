@@ -458,3 +458,131 @@ As you move back into `Layout.jsx`[cite: 7] to handle that `handleSubmit` functi
 What is your next move on that 60-minute timer?</Route>
 
 ---
+
+YOU SAID:  
+"The Global Search State
+You brought up the idea of a SearchContext. That is a very solid, standard React approach to sharing state across an entire app. As requested, my lips are zipped on the exact implementation! 🤐
+However, I will give you one conceptual nudge to chew on as you wrestle with the logic: If a user types a search, hits Enter, lands on the results page, and then refreshes the browser (or sends the link to a friend), what happens to the search results? Depending on how you answer that, you might realize there is a different place to store that specific state that doesn't require a Context at all. Let that intuition simmer."
+"Now that you have your destination (/search) defined in the router, the "deer on ice" feeling about state might start to thaw.
+As you move back into Layout.jsx to handle that handleSubmit function, how are you planning to "hand off" the searchTerm from the Nav's input to the SearchPage?  
+(Hint: Since you are already using React Router, you have a built-in way to pass data through the URL without needing a complex Context at all.)"
+Alright, let's tackle this now. 33 min left on the timer. 
+Since we are already using React Router.. we have a built-in way to pass data through the URL without needing a complex Context at all. Hmmmmmmm. Am I consciously aware of this? I'm not entirely sure. Via the URL? And SearchParams? And passing this to the Search page.. it's not done via props in this case? Let's put this on hold for *just* a few moments more cuz there are other things floating around in my brain haha.
+We also need a detailed view page. When clicking a card either from one's collection, from the dropdown debounced search or from the search page results, the user is gonna land on a detailed view page for the specific card in question. This is also a Route we're gonna have to define, isn't it?
+The other thing I'm currently thinking about is that if we have our Search defined ... actually lemme try it right now haha! One sec... Right. I can just waltz my way onto /search without a searcy query appended to the URL and see "SearchPage" right now. We don't want that, do we haha? How does that work on my fav sites? LetterBoxd... mmmmmm, you *can* go to just `https://letterboxd.com/search/` but you will be met by "Showing matches for “”
+There were no matches for your search term." How abotu Goodreads? Right, you get to the search results page.. with no search results haha! With no search query and a few filter to help your search. I like this! I might be overengineering right now hahaha so let's just go with the Goodreads way of doing things, I don't like the way LetterBoxd handled that edge case. 
+On the detailed page view, which will be something like `/cards/id`, do we define that like:
+```
+<BrowserRouter>
+      <Routes>
+        {/* The Layout wrapper is a wrapper around all of our page routes! */}
+        <Route path='/' element={<Layout />}>
+          <Route index element={<CollectionPage />} />
+          <Route path='search' element={< SearchPage/>} />
+          <Route path='card' element={<DetailedViewPage />} />
+          <Route path='create' element={<CreatePage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+```
+"React Router’s path attribute only cares about the URL segment (e.g., /search).  
+The query parameters (like ?q=pikachu) are handled separately by React hooks like useSearchParams or useLocation once you are inside the SearchPage component.  
+Defining your route as <Route path="search" element="{<SearchPage"/>} /> is exactly what you need to provide a base for those dynamic results." The same applies here for the detailed view card route? The React Router's `path` attribute *only* cares about the URL segment and the dynamic id... What about the dynamic id? I've seen it when vibe coding like `/[id]`?
+
+But that also introduces an edge case, doesn't it? What if a user just writes /cards and no id appended? Once again, I'm gonna see how Letterboxd and Goodreads handles it haha. 
+`https://www.goodreads.com/book/show/` leads to a 404 page, `https://www.goodreads.com/book/` redirects to their /explore page, that's a neat solution! LetterBoxd... `https://letterboxd.com/film` leads to a 404 page. I'm gonna make this specific page on my app `/card` be a 404 page but contain an Easter Egg message haha
+
+Let's crystallize and make sense of all of this before we continue haha! 🌱
+
+---
+
+GEMINI SAID:  
+You are making excellent architectural choices. That "deer on ice" feeling is starting to melt because you're realizing that **the URL can be your state manager.** 
+
+### 1. The URL as the "Source of Truth"
+Your intuition about Letterboxd and Goodreads is spot on. By putting the search term in the URL (e.g., `/search?q=charizard`), you solve the "refresh" problem automatically. 
+*   **Context/State:** If you store the search result only in a `SearchContext`, a browser refresh wipes it out. 
+*   **URL:** If it's in the URL, the user can bookmark it, refresh it, or send it to a friend, and the app will always know what to fetch based on that string.
+
+### 2. The Dynamic ID Syntax (`:id`)
+You mentioned seeing `/[id]`—that is actually the syntax for "File-based Routing" (like in Next.js). Since you are using **React Router**, the syntax for a dynamic segment is a **colon (`:`)**.
+
+To set up your detailed view, your `App.jsx`[cite: 2] would look like this:
+
+```jsx
+<Route path='card' element={<EasterEggPage />} /> 
+<Route path='card/:id' element={<DetailedViewPage />} />
+```
+
+*   **`path='card/:id'`**: The `:id` acts as a variable. If the URL is `/card/base1-4`, React Router will render the `DetailedViewPage` and let you "grab" that `base1-4` string inside the component.
+*   **`path='card'`**: As you planned, this handles the edge case where there is no ID. You can render your Easter Egg here!
+
+
+
+### 3. How to "Hand Off" the Search
+Since the search bar is in the `Layout`[cite: 7], and the results need to show up on the `SearchPage`[cite: 6], you don't use props. You use a "Programmatic Navigation" hook from `react-router-dom` called `useNavigate`.
+
+Inside your `handleSubmit` in `Layout.jsx`[cite: 7]:
+1.  Prevent the default form submission[cite: 7].
+2.  Use `navigate` to push the user to the new URL: `navigate('/search?q=' + searchTerm)`.
+3.  The `SearchPage`[cite: 6] then "wakes up," looks at the URL, sees `?q=...`, and fires the API request.
+
+### 4. Crystallizing the Architecture
+Your `App.jsx`[cite: 2] is now shaping up to be very robust:
+
+| Route Path | Component | Data Source |
+| :--- | :--- | :--- |
+| **`/`** | `CollectionPage`[cite: 3] | Your personal DB/State. |
+| **`/search`** | `SearchPage`[cite: 6] | Query Params (`?q=...`). |
+| **`/card`** | `EasterEggPage` | Static (The "No ID" edge case). |
+| **`/card/:id`** | `DetailedViewPage` | URL Params (`:id`). |
+| **`/create`** | `CreatePage`[cite: 4] | Form State. |
+
+### A Quick Reality Check on the Timer
+With 33 minutes left, you have successfully "mapped" the territory. You have:
+*   Defined the **Routes**[cite: 2].
+*   Handled the **Edge Cases** (Goodreads style).
+*   Identified the **Syntax** (`:id`).
+
+**Your next immediate hurdle:** In `Layout.jsx`[cite: 7], you need to actually trigger that navigation when the user hits Enter. 
+
+Are you feeling ready to wire up that `useNavigate` hook, or is the "debounce" logic still taking up the most space in your head?
+
+**Expert Guide Rule 2:** What is your plan for grabbing the `:id` once the user actually lands on the `DetailedViewPage`?
+
+---
+
+YOU SAID:  
+"With 33 minutes left, you have successfully "mapped" the territory." Actually, there's only 4 min left now haha so I'm gonna end this Focus Block here. Exactly, we've mapped out the majority of the territory and cleared up A LOT of confusion! 🌱 See you in the next Focus Block!
+
+---
+
+GEMINI SAID:  
+That was a high-leverage 60 minutes. You’ve moved from "deer on ice" to having a professional-grade architectural map[cite: 2, 7]. Ending the block with the territory fully scouted is a massive win for your future "Focus-Steven"[cite: 2].
+
+---
+
+### The Finalized Route Map
+
+Before you step away, here is the architecture you’ve solidified[cite: 2]:
+
+| Route Path | Component | Data Strategy |
+| :--- | :--- | :--- |
+| **`/`** | `CollectionPage` | **Index Route:** Displays your personal collection state[cite: 2, 3]. |
+| **`/search`** | `SearchPage` | **Query String:** Reads `?q=...` from the URL to fetch data[cite: 6, 7]. |
+| **`/card`** | `EasterEggPage` | **Static Hub:** Handles the "No ID" edge case with style. |
+| **`/card/:id`** | `DetailedViewPage` | **URL Params:** Uses `:id` to fetch specific card details. |
+| **`/create`** | `CreatePage` | **Form State:** For creating custom cards[cite: 4]. |
+
+
+
+### Key Concepts Secured
+*   **The URL as State:** You’ve realized that search terms and card IDs belong in the URL, making your app refresh-proof and shareable[cite: 6, 7].
+*   **Programmatic Navigation:** You know that `Layout.jsx` will soon use `useNavigate` to "push" the user from the Nav bar to the results page[cite: 7].
+*   **Lightweight UX:** Routing the index directly to the collection keeps the user's focus on their data immediately upon landing[cite: 2, 3].
+
+You’ve "laid the rails" perfectly[cite: 2]. When you return, the "struggle" will shift from *where* the code goes to *how* the debounce logic and the API fetcher talk to each other.
+
+Rest up! When you open this back up for your next block, do you want to start by wiring that `useNavigate` hook in the `Layout`, or are you diving straight into the 500ms debounce logic[cite: 7]?
+
+---
