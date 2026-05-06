@@ -586,3 +586,337 @@ You’ve "laid the rails" perfectly[cite: 2]. When you return, the "struggle" wi
 Rest up! When you open this back up for your next block, do you want to start by wiring that `useNavigate` hook in the `Layout`, or are you diving straight into the 500ms debounce logic[cite: 7]?
 
 ---
+
+YOU SAID:  
+Alright, next 60 minutes! This is our definition of done:
+```
+Hell yes.
+
+60 min Definition of Done — Search Query Flow + First Debounce Rep
+
+Linked sub-quest:
+Wealth → Sharpen software mastery through real building
+
+Intention:
+Push through router confusion cleanly enough that the navbar search can hand off a real query to the search results page, and the app architecture feels less mysterious by the end.
+
+───
+
+Done = all of these are true
+
+1. Enter from the navbar triggers real navigation
+
+When a user types in the navbar search and presses Enter:
+
+• they are taken to /search
+• the current search term is carried with them through the URL
+• the flow works intentionally, not accidentally
+
+2. SearchPage reads from the URL
+
+Inside SearchPage, the current search term is read from the URL itself rather than from random scattered state.
+
+By the end of the block, you can explain:
+
+• where that query lives
+• how SearchPage accesses it
+• why this is better than temporary local-only state for this case
+
+3. One full query loop works
+
+The smallest meaningful loop is complete:
+
+• type into navbar
+• press Enter
+• land on /search
+• SearchPage can see the same query
+• results logic is ready to use that value
+
+4. Debounce begins or lands
+
+Best case:
+
+• the 500ms debounce is functioning
+
+Good enough:
+
+• the debounce is partially wired, but the architecture for where it belongs is now clear and stable
+
+5. Confusion gets converted into named understanding
+
+By the end of the block, you can explain in plain words:
+
+• what useNavigate is doing
+• what triggers navigation
+• what is route path vs query string
+• what should trigger a request and what should not
+
+6. 429-prevention stays part of the design
+
+Your implementation respects the intent:
+
+• no request per keystroke
+• empty input is handled intentionally
+• debounce is treated as a protection mechanism, not a bonus
+
+───
+
+Strong win condition
+
+A big win is if you can say:
+
+“I can type in the navbar, press Enter, land on /search with the same query in the URL, and I understand the data flow well enough to wire debounce without guessing.”
+
+───
+
+Good enough for this block
+
+You do not need:
+
+• perfect styling
+• perfect dropdown UX
+• final refactor elegance
+• total mastery of React Router
+
+You do need:
+
+• one real search-query handoff
+• one real understanding rep
+• less fog than before
+
+───
+
+Suggested build order
+
+• 10 min: understand the handoff target clearly
+• 15 min: wire Enter → navigation
+• 15 min: make SearchPage read the query
+• 15 min: start or finish debounce
+• 5 min: test the loop and note what still feels slippery
+
+───
+
+Guardrails
+
+Keep asking:
+
+• Where does state live?
+• What belongs in the URL?
+• What should trigger a request?
+• What breaks if I refresh?
+• Am I understanding, or just copying shapes?
+
+───
+
+Difficulty:
+I’d call this a solid 7/10 block — not because it’s huge, but because it’s new and architecturally slippery.
+
+Now go start the timer. This is a beautiful struggle rep.
+```
+60 min on the timer starts... now! 🚀
+And I believe that I will need a nudge in the right dircetion immediately. 
+The Layout component that is the home for the global search bar will have this `const [searchTerm, setSearchTerm] = useState('');` as state, no? And this state that lives here.. will be pushed to the URL via useNavigate? Is that correct to say? 
+I... damn, this is overwhelming haha! Let's not focus on the debounce now immediately, let's focus on now this new mysterious useNavigate will co-interact with our handleSubmit function. Cuz we.. do need a handleSubmit function? Lemme sit in that and consciously consider it for a few moments..
+I also have a useEffect but this is the one that will contain the useTimeout for the debounce anti-429 effect I believe 
+Right. So let's focus on this: What is the nudge in the right direction needed for me to implement:
+* I write `charizard` in the search bar
+* I hit Enter or click the `Search` button
+* I land on `/search?q=charizard`?
+Lemme just real quick.. useNavigate is not from 'react'? Is it from.. Oooohhh!!! We import it from `'react-router-dom'`! Right! Lemme just read for a few quick moments. 
+```
+let navigate = useNavigate();
+navigate("/some/route?search=param");
+```
+Mmmm!! This is what we want!!! Right, so... alright, lemme try this on my own. 
+```
+let navigate = useNavigate();
+  function handleSubmit(e) {
+    e.preventDefault();
+    navigate(`search/q=${searchTerm}`);
+  }
+```
+Is this it??????? Let's try! Let's gooooo!!!!!!! I'm on `http://localhost:5173/search/q=charizard` after hitting Enter!! And I see a white space because "installHook.js:1 No routes matched location "/search/q=charizard" " but this can easily be fixed haha! 
+Is this how useNavigate is properly supposed to be used?
+
+---
+
+GEMINI SAID:  
+You are moving at lightning speed! That "Oooohhh!" moment is exactly what software mastery feels like in real-time. You’ve identified the correct tool (`useNavigate`) and the correct source (`react-router-dom`). 
+
+Here is your nudge to turn that "No routes matched" white screen back into a functioning app.
+
+### 1. Path vs. Query String
+In your `navigate` call, you wrote: ``navigate(`search/q=${searchTerm}`)``[cite: 7].
+*   **The Problem:** React Router is looking for a **path** that literally matches `search/q=charizard`. Your `App.jsx` only defines a route for `search`[cite: 2].
+*   **The Fix:** You need to use the **`?`** character to tell the browser: *"Stop looking for more folders, and start looking for variables."*
+
+**Correct Syntax:**
+```javascript
+navigate(`/search?q=${searchTerm}`);
+```
+
+Now, when you hit Enter, the URL will look like `localhost:5173/search?q=charizard`. React Router will see the `/search` part, match it to your `SearchPage`[cite: 2], and ignore the `?q=...` part when deciding which component to show.
+
+### 2. Reading the Data in `SearchPage`
+Now that you've "sent" the data via the URL, the `SearchPage` needs to "catch" it. React Router provides a specific hook for this called **`useSearchParams`**.
+
+It works almost exactly like `useState`, but it stays in sync with the URL bar.
+
+**Inside `SearchPage.jsx`:**
+```javascript
+import { useSearchParams } from 'react-router-dom';
+
+const SearchPage = () => {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q'); // This 'q' must match the 'q' in your URL
+
+  return (
+    <div>
+      <h1>Search Results for: {query}</h1>
+    </div>
+  );
+};
+```
+
+### 3. Why this is the "Pro" Move
+You asked if this is better than Context or scattered state. **Absolutely.**
+*   **Shareable Links:** You can now copy that URL and send it to someone, and they will see the exact same Pokémon[cite: 6].
+*   **Refresh Proof:** If you refresh the page, the `searchTerm` isn't lost because it’s written right there in the URL bar[cite: 6].
+
+
+
+### Architecture Check
+*   **State:** Lives in the `Layout` input while typing[cite: 7].
+*   **Handoff:** `useNavigate` pushes that state into the URL[cite: 7].
+*   **Consumption:** `SearchPage` reads that URL using `useSearchParams`[cite: 6].
+
+You have the "Navigation Loop" nearly closed. You are ready to tackle the "Debounce" logic to protect your API from those 429 errors.
+
+**Expert Guide Rule 2:** Since you already have a `useEffect` waiting in your `Layout.jsx`[cite: 7], how do you plan to prevent it from navigating to the search page *every time* the user types a single letter?
+
+---
+
+YOU SAID:  
+Ahhh!! I forgot the `?`!!! Which *is* present in any search URL! `https://www.goodreads.com/search?q=lord-of-the-rings&qid=` Got it, cheers!
+"2. Reading the Data in SearchPage
+Now that you've "sent" the data via the URL, the SearchPage needs to "catch" it. React Router provides a specific hook for this called useSearchParams." And this is where `useSearchParams` is used, I had a hunch haha! I won't read your output, I'm gonna try on my own first! Intuition and struggle first, please no unsolicited code!
+
+And also, handleSubmit should also clear the search query, right? This is standard behavior? If I searh "murakami" and hit Search on Goodreads.. yeah, the search bar is cleared. And on Letterboxd too? Actually no! It's still there! So this is a preference choice! And what would I prefer? Hmmmmm. 
+Or actually, looking more closely now on Goodreads; the nav search bar has been cleared but the *second* search bar on the actual search page still contains "murakami". While on Letterboxd, the navbar search bar still contains "treasure planet" and on the search result page it says "Showing matches for “treasure planet”", no second search bar, followed by the actual results. Ima go with the Letterboxd way of doing things here! No second search bar on the search result page and the search query is *not* cleared from the search bar on search by intention and design. Let's continue! 🚀
+
+---
+
+GEMINI SAID:  
+The **Letterboxd** approach is a fantastic choice for this project[cite: 7]. It makes the app feel persistent and unified—the user can see exactly what they searched for right there in the bar while they browse the results[cite: 7].
+
+
+
+### UI Syncing Strategy
+By choosing to keep the search term in the navbar, you’ve introduced a small but powerful logic challenge[cite: 7]:
+*   **The Scenario:** If a user types "Pikachu" and hits Enter, the URL becomes `/search?q=Pikachu`[cite: 7].
+*   **The Question:** If that user then clicks a link to their collection and *then* hits the "Back" button in their browser, what should the search bar show?
+*   **The Goal:** In a polished app, the `searchTerm` state in your `Layout` should ideally stay "in sync" with whatever is in the URL[cite: 7].
+
+### The `useSearchParams` Hunch
+Your hunch was perfect[cite: 6]. While `useNavigate` is for **sending** the user to a new location, `useSearchParams` is for **reading** the "inventory" of variables currently in the URL[cite: 6]. It provides a very simple method to "get" a specific value by the name you gave it (like `'q'`)[cite: 6].
+
+### A Nudge on the 429 Guardrail
+As you continue, remember your **Definition of Done** includes the **500ms debounce**[cite: 1]. 
+*   **The "Enter" Flow:** This triggers navigation immediately—one search, one request[cite: 7].
+*   **The "Debounce" Flow:** This is for the "Live" part of your intention—showing results *while* the user types without spamming the API[cite: 1, 7].
+
+How are you planning to distinguish between a "Live Search" (debounce) and a "Hard Search" (Enter key) in your `Layout` logic?[cite: 7] 
+
+Go get those results rendering! 🚀
+
+---
+
+YOU SAID:  
+"The Question: If that user then clicks a link to their collection and then hits the "Back" button in their browser, what should the search bar show?
+The Goal: In a polished app, the searchTerm state in your Layout should ideally stay "in sync" with whatever is in the URL." I'll let this brew in the back of my mind! Added to TODO.txt!
+
+"The useSearchParams Hunch
+Your hunch was perfect. While useNavigate is for sending the user to a new location, useSearchParams is for reading the "inventory" of variables currently in the URL. It provides a very simple method to "get" a specific value by the name you gave it (like 'q')." I read the hover docs and I have this now!
+```
+import { useSearchParams } from "react-router-dom"
+
+const SearchPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  return (
+    <div>
+      <p>Showing results for {searchParams}</p>
+    </div>
+  )
+}
+
+export default SearchPage
+```
+I intuitively thought "useSearchParams will also be imported from `"react-router-dom"`, won't it?" and law and behold, it is haha! What this gives us however...
+"""
+My CollectionCreate Custom Card
+Search
+Search term is currently pikachu
+Showing results for qpikachu
+"""
+.. is that haha! "qpikachu". Lemme see what I can do about this on my own first. It says that it returns a tuple? I've only used these in Python. Does that mean that I can... hold up.
+So we can't access only 'pikachu' through square brackets. 
+`<p>Showing results for {searchParams.toString().replace('q=', '')}</p>` And surely there's gotta be a more efficient and elegant way of extracting the actual search term than this hahaha?
+
+---
+
+GEMINI SAID:  
+Your intuition for finding the right tool is currently **100% accurate**[cite: 6]. You’ve moved from "deer on ice" to successfully navigating the core architecture of React Router[cite: 2, 6].
+
+### The "Pro" Way to Extract Parameters
+You are exactly right—there is a much cleaner way than string replacement[cite: 6]. Since the first element in that tuple (`searchParams`) is a standard **`URLSearchParams`** object, it comes with built-in methods designed specifically for this task[cite: 6].
+
+The "tuple" you noticed is **Array Destructuring** in JavaScript, which works very similarly to Python’s tuple unpacking[cite: 6]:
+
+```javascript
+// searchParams is the object containing all your variables
+// setSearchParams is a function to update the URL (if you ever need to)
+const [searchParams, setSearchParams] = useSearchParams();
+
+// Use the .get() method to pluck a specific value by its key
+const searchTerm = searchParams.get('q'); 
+```
+
+### Why `.get()` is Superior
+*   **Decodes Automatically**: If a user searches for "Pikachu & Friends," the URL will show `?q=Pikachu%20%26%20Friends`. The `.get()` method automatically decodes those symbols back into a clean string for you[cite: 6].
+*   **Multiple Params**: If your URL grows to `?q=pikachu&type=electric&limit=20`, you can simply call `.get('type')` or `.get('limit')` without doing any complex string math[cite: 6].
+*   **Null Safety**: If the user goes to `/search` with no query at all, `.get('q')` simply returns `null` instead of breaking your app[cite: 6].
+
+
+
+---
+
+### Syncing the Navbar (The Final Stretch)
+You’ve successfully "sent" the data from the `Layout` and "caught" it in the `SearchPage`[cite: 6, 7]. Now, think back to that TODO in your `TODO.txt` about the **Back button**[cite: 7].
+
+If the user hits "Back" from the `SearchPage` to the `CollectionPage`, the URL changes, but your **Navbar search bar** might still show the old search term[cite: 7]. 
+
+**Expert Guide Rule 2:** Since you already have `useEffect` in your `Layout`[cite: 7], can you think of a way to use a hook in that `Layout` to "listen" to the URL and update the `searchTerm` state whenever the URL changes?
+
+---
+
+YOU SAID:  
+"const searchTerm = searchParams.get('q'); " Ah. Like a dict in Python haha! This makes so much more sense hahaha!
+25 min left on the timer. 
+I want to put focus on API integration. I wanna see data in the app. It won't be real-time and debounced yet but I want to be able to write charizard in the search bar, hit Enter, and see the real search results for Charizard. Intuition and struggle first. I'll be back either once it's implemented or if I've hit a bump and need a nudge in the right direction! 🚀
+
+---
+
+GEMINI SAID:  
+The comparison to a Python dictionary is spot on—`.get('q')` is the precise tool for extracting values from that search object[cite: 6].
+
+Focusing on API integration is a great pivot for the remaining 25 minutes[cite: 1]. Seeing real data on the screen is the "Aha!" moment that proves your architecture is actually working[cite: 1].
+
+As you dive into the "struggle" of the fetch logic, keep these foundational patterns in mind:
+*   **The Trigger:** Your `SearchPage` needs to "listen" for changes to the query you just extracted[cite: 7].
+*   **The Lifecycle:** You'll likely need to manage a few different states: the `data` itself, a `loading` state to keep the UI from looking broken, and an `error` state in case the API is grumpy[cite: 1].
+*   **Reference Material:** If you hit a syntax snag with `useEffect` or handling asynchronous data, the **"Robin Wieruch - The Road to React.pdf"** has dedicated sections on **"Data Fetching with React" (Page 111)** and **"Async/Await in React" (Page 123)** that mirror exactly what you are trying to do right now[cite: 1].
+
+I’m standing by. Go get those Charizards on the screen! 🚀
+
+---
