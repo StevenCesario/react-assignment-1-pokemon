@@ -2830,3 +2830,116 @@ Here is the synthesis of the final logic you requested for `SearchPage.jsx`:
 **Expert Guide Rule 2**: Now that the "Locker" (`useRef`) is holding your timer ID safely, do you feel ready to tackle the `disabled` logic on your buttons to prevent users from trying to navigate to "Page 0" or "Page Infinity"? 🚀
 
 ---
+
+YOU SAID:  
+Mmmmmmmm. "The Fix: You need to add the Maps call back into handleSubmit so that it acts as an immediate jump." Yes, this makes perfect intuitive sense. The debouncing logic is commited! 🚀
+
+Alright! And I believe I have the next and previous buttons fully implemented now? I don't wanna burn through too many requests haha, I'm already at 55/100 in hourly usage. I'm attaching both Layout.jsx and SearchPage.jsx. Is *what we have discussed* cleanly implemented? What would be needed for a v1?
+And I understanding that this could be upgrade to a Google type of pagination where if there are a total of say 16 pages you would see something like `1, 2, 3, 4, ... 15, 16`
+But let's focus on getting what is in front of my eyes fully working now! 
+
+"Pro-Tip: The "Guardrail" Pattern
+While we can't stop the behavior, we can handle it gracefully. You already have the pagination object in your state. In your next block, you could add a "Redirect" or a "Safety Check" like this:
+
+The Logic: If the API comes back and says total_pages is 31, but the current page is 999, you could automatically trigger a setSearchParams to send them back to page 1, or show a big "You've wandered too far into the tall grass!" message." I'm also just now thinking about what you wrote up here. 
+"or show a big "You've wandered too far into the tall grass!" message." I like this. A lot. I want Easter Eggs and reward curious explorers of the page haha. If they go to `/card`, they get an Easter Egg. And an Easter Egg with a message like this if they write a page number larger than total_pages too. Adding it to TODO.txt, cheers!
+
+---
+
+GEMINI SAID:  
+The logic is looking sharp! You've officially turned the "429 machine" into a controlled, URL-driven engine.
+
+The "Locker" implementation in `Layout.jsx` is spot-on. You've successfully bridged the gap between the automated pilot (the `useEffect`) and the manual override (`handleSubmit`). By killing the timer and navigating immediately on submit, you've ensured the app feels snappy regardless of how fast the user hits Enter.
+
+In `SearchPage.jsx`, the pagination loop is now functionally complete. You're correctly treating the URL as the Source of Truth, and your handlers are cleanly updating that truth.
+
+### The Last "Senior-Level" Bug
+There is one tiny trap left in your `SearchPage.jsx`. Look at your error rendering:
+
+```javascript
+if (error) return (<p>Error loading page: {error}</p>) //
+```
+
+If the API fails (like that 429 error), Axios often stores a complex **Object** in your `error` state. React will crash if you try to render an object directly inside a `<p>` tag because it only knows how to display strings, numbers, or elements. 
+
+**The Fix:** You need to point React to a specific string inside that object, like `error.message` or a fallback string.
+
+---
+
+### Roadmap to v1
+To move from "working prototype" to "v1," consider these three polish items:
+
+* **The "No Query" Landing**: Currently, navigating directly to `/search` without a `?q=` parameter causes your code to display a "Showing results for 'null'" message. An early return like `if (!query) return <p>Enter a Pokémon name above to start your search!</p>` makes the page feel intentional.
+* **The "Zero Results" State**: If a user searches for something that doesn't exist, the API returns an empty array. Showing a "No cards found for [query]" message is a much better experience than a blank list.
+* **Loading Feedback**: Right now, when a user clicks "Next," the old cards stay on the screen until the new ones arrive. Adding a `loading` state at the start of your fetch and showing a message (or skeleton cards) provides crucial feedback.
+
+### The "Tall Grass" Easter Egg
+Rewarding curious explorers is a fantastic idea! Implementing the "Tall Grass" message for page numbers that exceed `pagination.total_pages` adds significant personality to the app. You can check this right after your `fetchResults` completes: `if (page > data.pagination.total_pages) { // Show Easter Egg }`.
+
+---
+
+Since you're managing the `loading` state next, would you prefer to implement a simple "Loading..." text first, or are you feeling adventurous enough to try building a **Skeleton Loader** that mimics the shape of the cards?
+
+---
+
+YOU SAID:  
+Right. Beautiful! We have 5 min left on the timer, I'm gonna start rounding off.
+"The Fix: You need to point React to a specific string inside that object, like error.message or a fallback string." I'll implement this straight away, it takes 5 seconds.
+
+Integrating a loading state is on the TODO. 
+"The "No Query" Landing: Currently, navigating directly to /search without a ?q= parameter causes your code to display a "Showing results for 'null'" message. An early return like if (!query) return <p>Enter a Pokémon name above to start your search!</p> makes the page feel intentional."  Adding this and the "Zero Results" state there now too! And for that we can use derived state! It's simply the state where searchResults.length === 0!
+"or are you feeling adventurous enough to try building a Skeleton Loader that mimics the shape of the cards?" Can you expand and elaborate on what you mean with this?
+
+But start of the next focus block, we're gonna go for the next high leverage focus of being able to click either the image, the name or any other part of a card to get to the detailed view page of that card. Where a user will be able to add it to their collection! 
+But all that feels like somewhat familiar ground in a new context and scenario. I definitely feel like we've covered the most uncharted territories now. Til the next focus block! 🌱
+
+---
+
+GEMINI SAID:  
+## The Home Stretch: Polishing the Feedback Loop
+
+You’ve officially transitioned from "making it work" to "making it professional." Using **derived state** for your "Zero Results" logic is a textbook-perfect React pattern—it’s cleaner than maintaining a separate `isEmpty` state because it’s always based on the data you already have.
+
+Regarding your error fix, remember that `error.message` is usually the safest bet for a readable string.
+
+---
+
+### Elaborating on the "Skeleton Loader"
+
+A **Skeleton Loader** (or "Ghost Element") is a UI pattern where you display light-gray, pulsing shapes that mimic the layout of your cards while the API is still fetching data.
+
+* **The UX Benefit**: It reduces "visual jumpiness." Instead of the page being blank and then suddenly "popping" 20 cards into existence, the user sees the *structure* of the page immediately. It makes the app feel faster than it actually is.
+* **The Implementation**: You create a "dummy" version of your `Card` component that just renders `<div>`s with a gray background and a pulsing animation instead of the real Pokémon image and text.
+* **The Logic**: While your `loading` state is true, you map over an empty array of say, 8 items, and show these skeletons.
+
+
+
+---
+
+### The Next Frontier: Detailed View
+
+You’re heading into a core feature of any CRUD app: **Dynamic Routing**. 
+
+When you start the next block to implement the "Detailed View," you’ll likely be looking at:
+1.  **React Router Links**: Wrapping your `Card` content in a `<Link to={`/card/${card.id}`}>`.
+2.  **Dynamic Params**: Creating a route like `/card/:id` that knows how to extract that ID from the URL.
+3.  **Specific Fetching**: Calling a new API endpoint specifically for a single card's data based on that ID.
+
+---
+
+### Current TODO Progress
+
+* [x] **Debounced Search**: Navigating via URL with a 500ms delay.
+* [x] **Manual Override**: Immediate navigation on "Enter".
+* [x] **Pagination Logic**: URL-driven "Next" and "Previous".
+* [x] **Source of Truth**: All variables (q, page, limit) successfully passed to API.
+* [ ] **Loading & Empty States**: (Next block).
+* [ ] **Detailed View**: (Next block).
+
+You have navigated the most complex architectural waters of this project. The rest is about building features on top of this rock-solid foundation.
+
+When you're ready to start the detailed view, do you want to begin with the **API work** to fetch a single card, or the **UI work** of setting up the new page and its route? 🌱
+
+**Expert Guide Rule 2 applied.**
+
+---

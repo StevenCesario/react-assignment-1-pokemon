@@ -76,7 +76,7 @@ const SearchPage = () => {
     });
   }
 
-  if (error) return (<p>Error loading page: {error}</p>)
+  if (error) return (<p>Error loading page: {error.message}</p>)
 
   return (
     <div>
