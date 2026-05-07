@@ -40,10 +40,6 @@ const SearchPage = () => {
   }, [query, page, limit]); // This useEffect runs whenever `q=` changes in our URL. Now also listens for changes in page and limit! All our "URL" variables
 
   // I might find a way to mash these two functions together
-  function handlePrevPage() {
-    // To be implemented
-  }
-
   function handleNextPage() {
     // Right, so.. like Gemini said. I'm not gonna look at it yet.. this changes the *URL*. 
     // So. We need to use `prev` in conjunction with setSearchParams?
@@ -70,6 +66,14 @@ const SearchPage = () => {
     //   prev.set('page', pagination.page + 1);
     //   return prev;
     // }); Nope. This is not necessary *at all* haha!
+  }
+
+  function handlePrevPage() {
+    // Will be super similar to its sibling above!
+    setSearchParams(prev => {
+      prev.set('page', page - 1); // This is the only difference, isn't it? And the "safety check" lies in the disabled attribute boolean expressions on the buttons
+      return prev;
+    });
   }
 
   if (error) return (<p>Error loading page: {error}</p>)
