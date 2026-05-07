@@ -2650,3 +2650,183 @@ You’ve done the hard mental work of mapping out the logic today. When you plug
 Enjoy the break 🌱. Do you think you'll want to tackle the "Empty Search" edge case first thing in the next block, or just focus on getting the core `useRef` logic wired up?
 
 ---
+
+YOU SAID:  
+Alright. Time for the next block. Let's focus on getting the core `useRef` logic wired up, and then build from that momentum into handlePrevPage and the rest of the pagination. This is the Definition of Done:
+```
+Yes — strong sequencing. Momentum block into deeper block is working.
+
+Focus Block
+
+• Duration: 45 min
+• Linked Sub-quest: Sharpen software mastery through real building
+• Task: Understand and implement useRef to finish debouncing, then complete pagination logic in SearchPage.jsx
+• Assumed difficulty: Hard
+
+Definition of Done
+
+1. You understand why useRef is needed here:
+  • the timeout ID must survive renders
+  • it must be accessible from both useEffect and handleSubmit
+  • updating it should not trigger a re-render
+2. Debounced search navigation is fully wired:
+  • typing does not trigger a request on every keystroke
+  • the timeout is stored via useRef
+  • old pending timeouts are cleared correctly
+3. Manual submit behavior is clean:
+  • pressing Enter or clicking Search does not create duplicate navigations
+  • if needed, pending debounce is cancelled before immediate navigation
+4. handlePrevPage is implemented correctly.
+5. handleNextPage and handlePrevPage both update the URL correctly.
+6. Pagination works end-to-end from the URL as source of truth:
+  • changing page updates URL
+  • URL change triggers fetch
+  • fetch returns correct page data
+  • UI updates to the correct results
+7. Edge cases are handled cleanly:
+  • Previous disabled on page 1
+  • Next disabled on last page
+  • new search resets to page 1
+  • invalid/empty query does not cause weird behavior
+  • empty results state is sane
+8. Request flow is under control:
+  • no accidental duplicate fetches from bad state syncing
+  • no manual pagination mutations that fight the URL-driven model
+9. You verify it with real checks:
+  • Network tab and/or console confirms fewer requests
+  • pagination requests use the correct query, page, and limit
+10. You can explain the full chain clearly:
+
+• input changes
+• debounce waits
+• navigation updates URL
+• SearchPage reacts
+• API fetch runs
+• pagination state updates from server response
+
+11. If the loop is clean, make the real commit.
+
+Success condition for this block
+
+• Full win: debouncing and pagination both work cleanly with edge cases handled.
+• Partial win: one of the two is fully working and the other is isolated clearly enough to finish in the next block without confusion.
+
+That’s a serious block. Go close the loop. 
+```
+I will start this block with reading what you've written about `useRef` and why we need it here. I love that I have unknowingly stumbled upon a use case that will most likely clarify it in my mind haha. Starting 45 min on my focus timer... now! 🚀
+Aight. 
+The "Houdini Problem" of React scoping haha. So it's a hook that helps with scoping issues. To solve it.. we need a way to store a value that stays with the component.. *but doesn't trigger a re-render every time it changes*. Still very fuzzy and abstract but let's keep reading.
+The "Persistent Box". A little storage locker that sits *outside of the React render cycle*. Hmm, right. 
+It's created like a state variable without the array, right. 
+ "Storage: Inside the useEffect, instead of a local variable, you put the timer in the locker: timeoutRef.current = setTimeout(...)." Mmmmm. Okay. Our `useRef` variable.current. Alright. Yeah. Instead of creating a new locally scoped function variable... we put the timer inside of the locker haha! Alright. 
+"Access: Now, handleSubmit can walk up to that same locker, look inside timeoutRef.current, and call clearTimeout on it." Ooooohhhhhhh. What we *have put inside of the locker*... is *now available everywhere in the code*! handleSubmit now *has* access to the timeout variable via timeoutRef.current. Wow. This... feels incredibly overpowered haha!
+"The effect is still the automated pilot. It clears any old timer in the ref, starts a new 500ms timer, and stores the new ID in timeoutRef.current." Right. In the truest sense, it only stores the *newest, freshest and current* timeout variable. 
+"Why not just use useState?
+If you used const [timeoutId, setTimeoutId] = useState(), the component would re-render every single time you started or cleared a timer. Since we're doing this on every keystroke, that would be a massive performance hit. useRef lets you change the value silently behind the scenes." Aaaaaaaahhhhhh. I had this read this twice, it didn't click the first time I read it. Everytime we interacted with the content in the locker, it would trigger a re-render of the page! It would be a nightmare to be on haha! `useRef` lets us interact with the timeout variable silently behind the scenes. Right. 
+"The Ref Syntax Note: Always remember that with useRef, you have to talk to .current. It’s like the timer ID is sitting inside a box, and you have to open the box to use it." Yes. We always refer to "the current content in the locker" via .current. Got it. 
+"Teachers often undersell it because if you use it too much, you’re basically fighting React’s "reactive" nature. But for your specific problem—killing a timer that lives across multiple renders—it is the only tool for the job." Right. This touches upon my comment about it feeling overpowered cuz... in a sense, especially if you use it too often when it's not needed.. it is? Isn't it? And like you wrote, it fights the very nature of React as a framework. `useRef` falls into that category of methods and functions labeled "Only use when absolutely necessary", doesn't it haha?
+Alright. 33 min left on the timer. Let's crystallize and synthesize and then I'll be on my way to implement it! 🌱
+
+---
+
+GEMINI SAID:  
+You’ve hit on exactly why senior developers both love and fear `useRef`. You correctly intuited that it is a bit of a "rule-breaker." If `useState` is the front door of React (where everything is tracked and orderly), `useRef` is the secret back alleyway where you can move things around without the neighbors (the rest of the UI) noticing.
+
+It is definitely in the "use only when necessary" category. If you used it for everything, your app would stop being "reactive," and you'd just be writing plain old imperative JavaScript again. But for timers, DOM elements, or values that need to survive a re-render without *causing* one, it is the perfect tool.
+
+### The Final Synthesis: Layout.jsx
+Before you dive into the code, let’s lock in the logic for your "Manual Override" search.
+
+1.  **The Keystroke**: User types. `useEffect` wakes up.
+2.  **The Cleanup**: It looks in the locker (`timeoutRef.current`). If there’s an old timer ID there, it kills it.
+3.  **The New Timer**: It starts a 500ms timer and puts the new ID in the locker. If 500ms pass, it navigates automatically.
+4.  **The Manual Override (`handleSubmit`)**: If the user hits Enter *before* the 500ms is up, this function reaches into the locker, kills the pending timer, and navigates **immediately**.
+
+
+
+### The Final Synthesis: SearchPage.jsx
+Once you land on the search page, the "White Whale" of pagination needs to be put to bed.
+
+1.  **Source of Truth**: Your `handleNextPage` and `handlePrevPage` should only do **one thing**: update the URL using `setSearchParams`.
+2.  **The React Chain**: Because `page` is a dependency in your `useEffect`, the page will automatically re-fetch the data when the URL changes.
+3.  **The Reset**: Crucial edge case—whenever the `query` changes (a brand new search), you want to make sure the user starts on **Page 1**, even if they were just on Page 10 of a previous search.
+
+
+
+### Ready to Build
+You have 33 minutes. That is plenty of time to:
+* Wire up the `useRef` in `Layout.jsx`.
+* Clean up the `SearchPage.jsx` logic to pass `page` and `limit` to the API.
+* Add the `disabled` logic to your buttons.
+
+One tiny hint for the `SearchPage` reset: Inside the logic where the user submits a *new* search in the `Layout`, you can ensure the `page` is set to 1 in that `Maps` call.
+
+**Expert Guide Rule 2:** When you implement `handlePrevPage`, how do you plan to handle the calculation—will you use the `page` variable from the URL or the `page` value from the API's `pagination` object? 🚀
+
+---
+
+YOU SAID:  
+"It is definitely in the "use only when necessary" category. If you used it for everything, your app would stop being "reactive," and you'd just be writing plain old imperative JavaScript again." It'd be imperative force rather than declarative flow haha! 🌊
+Values that *need to survive a re-render without causing one*. Mmmmm.
+"The Final Synthesis: Layout.jsx
+Before you dive into the code, let’s lock in the logic for your "Manual Override" search.
+
+The Keystroke: User types. useEffect wakes up.
+The Cleanup: It looks in the locker (timeoutRef.current). If there’s an old timer ID there, it kills it.
+The New Timer: It starts a 500ms timer and puts the new ID in the locker. If 500ms pass, it navigates automatically.
+The Manual Override (handleSubmit): If the user hits Enter before the 500ms is up, this function reaches into the locker, kills the pending timer, and navigates immediately." Yes. I will implement this. *Then* I will read the output you just did for SearchPage.jsx. Write *nothing more* haha! Let's go 🚀
+
+---
+
+GEMINI SAID:  
+The locker is open. Go turn that imperative force into declarative flow. 🌊🚀
+
+---
+
+YOU SAID:  
+Alright, attaching Layout.jsx! Have I missed anything in my implementation?
+
+---
+
+GEMINI SAID:  
+The "Locker" is officially wired up, and your logic for the `useEffect` is a masterclass in **Declarative Flow**. You successfully moved the navigation into the automated pilot and used `useRef` to bridge the gap between your effect and your manual handler.
+
+However, you missed one tiny but critical "button press" in your `handleSubmit` that would leave your users hanging if they hit the Enter key.
+
+### The Missing "Manual Pilot" Instruction
+
+In your `handleSubmit`, you correctly call `clearTimeout(timeoutRef.current)`, which effectively tells the automated pilot: *"I've got the controls, you can sit this one out"*.
+
+But right now, you aren't actually **telling the plane to fly**. 
+
+If a user types "Sceptile" and hits Enter immediately:
+1.  The `useEffect` starts a timer for 500ms.
+2.  `handleSubmit` fires and kills that timer.
+3.  **The Result**: Nothing happens! The URL never updates because the timer was destroyed before it could finish, and `handleSubmit` didn't initiate its own navigation.
+
+**The Fix**: You need to add the `Maps` call back into `handleSubmit` so that it acts as an **immediate** jump.
+
+```javascript
+function handleSubmit(e) {
+  e.preventDefault();
+  if (!searchTerm.trim()) return; // Safety check
+
+  clearTimeout(timeoutRef.current); // Kill the automated pilot
+  navigate(`/search?q=${searchTerm}`); // Perform the jump immediately!
+}
+```
+
+### The SearchPage.jsx Transition
+
+With the `Layout` now acting as a sophisticated "Traffic Controller" for your URLs, the `SearchPage` can stop worrying about *when* a search happens and just focus on *what* to fetch.
+
+Here is the synthesis of the final logic you requested for `SearchPage.jsx`:
+
+1.  **The Holy Trinity Call**: Ensure your `useEffect` passes all three variables to the API helper: `const data = await searchCards(query, page, limit);`.
+2.  **The Stateless Handlers**: Your `handleNextPage` and `handlePrevPage` should only touch the URL. Since you already fixed the `return prev` syntax error, these should just increment or decrement the `page` variable you extracted from the `searchParams`.
+3.  **The Reset Logic**: Since your `Layout` now handles the start of a search, you've naturally solved the "Page 1 Reset". Every time a user types a new word, `Layout` sends them to a URL that doesn't have a `&page=` parameter yet, which your `SearchPage` correctly defaults to `1`.
+
+
+**Expert Guide Rule 2**: Now that the "Locker" (`useRef`) is holding your timer ID safely, do you feel ready to tackle the `disabled` logic on your buttons to prevent users from trying to navigate to "Page 0" or "Page Infinity"? 🚀
+
+---

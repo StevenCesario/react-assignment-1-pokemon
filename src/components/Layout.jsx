@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 const Layout = () => {
   const [searchTerm, setSearchTerm] = useState('');
   // const [isDebounced, setIsDebounced] = useState(false); Ended up not being used. But I love keeping all the brain artifacts 
+  const timeoutRef = useRef(); // The secret sauce that we need to access the timeout variable scoped to our useEffect in our handleSubmit!
   
   let navigate = useNavigate();
 
@@ -28,20 +29,27 @@ const Layout = () => {
     if (!searchTerm.trim()) return;
 
     // Start the timer. The navigation takes place 500ms after a change in the searchTerm state variable IF there is not another change in it before those 500ms
-    const timeout = setTimeout(() => {
+    // const timeout = setTimeout(() => {
+    //   navigate(`/search?q=${searchTerm}`);
+    // }, 500); And this changes to...
+    timeoutRef.current = setTimeout(() => {
       navigate(`/search?q=${searchTerm}`);
-    }, 500);
+    }, 500); // .. this! Which allows us to...
 
     // And then the important cleanup. If the user types again before 500ms, this kills the previous timer
-    return () => clearTimeout(timeout);
+    return () => clearTimeout(timeoutRef.current); // This doesn't clear `timeout` anymore, but timeoutRef.current!
   }, [searchTerm, navigate]); //  navigation needs to be added to the dependency array now
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (!searchTerm.trim()) return; // Safety check
     // if (!isDebounced) navigate(`/search?q=${searchTerm}`); // Only navigate to the search result page if we're currently not debounced
     // The navigation doesn't live here anymore! It now lives in the useEffect!
     // All this does now is making it possible to hit Enter or press the Search button BEFORE the 500ms and still navigate to the search page! 
-
+    // ... use it down here!
+    clearTimeout(timeoutRef.current);
+    // But this is not all. We've killed the automated navigation, now we need to add a manual one haha!
+    navigate(`/search?q=${searchTerm}`);
 
     // setSearchTerm(''); We'll see if this is implemented or not in the final product! For now; no!
   }
