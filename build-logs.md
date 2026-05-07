@@ -1591,3 +1591,116 @@ I’m standing by in "Read-Only" mode. Your map is laid out, the `responseType: 
 Go earn the rep. 🚀
 
 ---
+
+YOU SAID:  
+WE CAN SEE THE CHARIZARDS 🐉 I haven't missed anything important in the code imoplmentation? Attaching api.js and Card.jsx
+
+![CHARIZARDS IN VISIBLE FORM](screenshots/Screenshot_2026-05-07_06-40-30.png)
+
+---
+
+GEMINI SAID:  
+HELL YES! 🐉 Seeing those fiery boys render on the screen from raw binary data is a massive level-up. You officially crushed the core objective of this block. 
+
+Your `api.js` is absolutely flawless. The `responseType: 'blob'` is wired perfectly, and keeping the logic isolated there makes the component so much cleaner.
+
+However, since you explicitly asked if you missed anything important... there is one incredibly subtle, "senior-level" React trap hiding in your `Card.jsx` `useEffect`.
+
+Take a close look at your cleanup function:
+
+```javascript
+return () => {
+  if (imageSrc) URL.revokeObjectURL(imageSrc); 
+};
+```
+
+Here is the trap: Because `imageSrc` is a React state variable, and it is *not* in your `useEffect` dependency array, that cleanup function is suffering from a "stale closure." 
+
+It only remembers what `imageSrc` was at the exact moment the effect started. What was `imageSrc` when the component first mounted? `null`. 
+
+So, when the component eventually unmounts (like if you navigate away), the cleanup function runs and essentially says: `URL.revokeObjectURL(null)`. The actual temporary URL you created gets left behind, causing a memory leak!
+
+How can you adjust the variables *inside* that `useEffect` block so the cleanup function has direct access to the `localURL` you generated, without relying on the React state at all?
+
+---
+
+YOU SAID:  
+"How can you adjust the variables inside that useEffect block so the cleanup function has direct access to the localURL you generated, without relying on the React state at all?" I.. genuinely have no idea. My intuition is very quiety. This whole thing with blob and createObjectURL as I wrote in the code is completely foreign to me
+```
+  useEffect(() => {
+    let localURL;
+    const fetchImage = async () => {
+      try {
+        const blob = await getCardImage(card.id);
+        localURL = URL.createObjectURL(blob); // This is *completely* foreign to me
+        setImageSrc(localURL);
+      } catch (err) {
+        console.error("Image failed to load");
+        setError(err);
+      }
+    };
+
+    fetchImage();
+
+    // Important cleanup function to prevent memory leaks!
+    return () => {
+      if (localURL) URL.revokeObjectURL(localURL); // This feels like the clearTimeout to setTimeout haha
+    };
+  }, [card.id]);
+```
+But do you mean like this? Not sure what you're hinting to or pointing to at all
+
+---
+
+GEMINI SAID:  
+Your intuition actually just woke up and nailed it. That is exactly the fix.
+
+By moving `let localURL;` inside the `useEffect` but outside the `fetchImage` function, you’ve created a variable that exists in the **exact same scope** as your cleanup function. 
+
+### Why this works (The "Snapshot" Concept)
+Every time a React component renders, it's like a brand-new snapshot. When the `useEffect` runs, it creates its own little "bubble" of memory for that specific execution. 
+
+1.  **The Setup:** Inside that bubble, you define `localURL`. 
+2.  **The Async Handoff:** `fetchImage` runs, gets the blob, and assigns the URL to that `localURL` variable.
+3.  **The Cleanup Bond:** When you `return` a function, React "saves" that function in its pocket. Because of a JavaScript concept called **Closures**, that cleanup function is permanently tethered to the variables inside the bubble where it was born.
+
+
+
+In your previous version, the cleanup function was looking at the `imageSrc` **state**. Because state updates are "scheduled" and don't happen instantly, the cleanup function (which is defined at the very beginning of the effect) was looking at the `imageSrc` from the *previous* render (which was `null`).
+
+With your new version, the cleanup function doesn't care about state at all. It just looks at the `localURL` variable sitting right next to it in the same bubble. 
+
+### One small "Synchronicity" tweak
+Since `fetchImage` is `async`, it starts, and then the rest of the code keeps moving. There is a tiny chance the component could unmount *before* the image finishes fetching. To be 100% bulletproof, you can use the same pattern people use for `setTimeout`:
+
+```javascript
+  useEffect(() => {
+    let localURL;
+    let isMounted = true; // Track if the component is still around
+
+    const fetchImage = async () => {
+      try {
+        const blob = await getCardImage(card.id);
+        if (isMounted) { // Only update state and create URL if still mounted
+          localURL = URL.createObjectURL(blob);
+          setImageSrc(localURL);
+        }
+      } catch (err) {
+        if (isMounted) setError(err);
+      }
+    };
+
+    fetchImage();
+
+    return () => {
+      isMounted = false; // Mark as unmounted
+      if (localURL) URL.revokeObjectURL(localURL);
+    };
+  }, [card.id]);
+```
+
+You just leveled up from "writing code that works" to "writing code that manages memory properly." That is a huge jump in 30 minutes.
+
+What's the next move? Do you want to polish the search results UI now that the images are working, or are you heading back to the pagination challenge? 🐉
+
+---

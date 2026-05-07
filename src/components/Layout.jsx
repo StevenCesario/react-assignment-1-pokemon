@@ -26,8 +26,8 @@ const Layout = () => {
           <button type='submit'>Search</button>
         </form>
 
-        {/* For debugging purposes only, will be removed in the finished product */}
-        <p>Search term is currently {searchTerm}</p>
+        {/* For debugging purposes only, won't be visible in the finished product */}
+        {/* <p>Search term is currently {searchTerm}</p> */}
       </nav>
 
       <main>

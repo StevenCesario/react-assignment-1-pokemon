@@ -70,14 +70,18 @@ const Card = ({ card }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let localURL;
+    let isMounted = true; // Track if the component is still around
+    
     const fetchImage = async () => {
       try {
         const blob = await getCardImage(card.id);
-        const localURL = URL.createObjectURL(blob); // This is *completely* foreign to me
-        setImageSrc(localURL);
+        if (isMounted) { // Only update state and create URL if still mounted
+          localURL = URL.createObjectURL(blob); // This is *completely* foreign to me
+          setImageSrc(localURL);
+        }
       } catch (err) {
-        console.error("Image failed to load");
-        setError(err);
+        if (isMounted) setError(err);
       }
     };
 
@@ -85,7 +89,8 @@ const Card = ({ card }) => {
 
     // Important cleanup function to prevent memory leaks!
     return () => {
-      if (imageSrc) URL.revokeObjectURL(imageSrc); // This feels like the clearTimeout to setTimeout haha
+      isMounted = false; // Mark as unmounted
+      if (localURL) URL.revokeObjectURL(localURL); // This feels like the clearTimeout to setTimeout haha
     };
   }, [card.id]);
 
