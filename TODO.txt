@@ -7,3 +7,7 @@
 * Properly handle the blank /search page
 * debounce
 * Fix "Objects are not valid" React Error
+
+If there is time
+* Explore page with 20 randomized cards (take my code from Vibe Salad and make it work in this context!)
+* Not only "Add to Collection"; "Add to Wishlist"!
