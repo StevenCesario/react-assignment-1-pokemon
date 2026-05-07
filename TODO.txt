@@ -5,3 +5,5 @@
 * getCardById api function that calls GET /cards/:id
 * Loading state implemented on API requests
 * Properly handle the blank /search page
+* debounce
+* Fix "Objects are not valid" React Error

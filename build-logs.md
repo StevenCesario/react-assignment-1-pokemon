@@ -2303,6 +2303,8 @@ Go get those pages turning! 🐋🚀
 
 YOU SAID:  
 And what a timely end to the the focus block too; I've gotten the dreaded 429 Error since I've hit my hourly limit hahaha!
+![429 Too Many Requests](screenshots/Screenshot_2026-05-07_09-39-57.png)
+![125/100 hourly requests](screenshots/Screenshot_2026-05-07_09-40-20.png)
 
 ---
 
