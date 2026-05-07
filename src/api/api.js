@@ -7,11 +7,15 @@ const pokemonAPI = axios.create({
   }
 }); 
 
-export const searchCards = async (query) => {
+export const searchCards = async (query, page=1, limit=20) => {
   try {
     const response = await pokemonAPI.get('/search', {
       // headers: {'X-API-Key': import.meta.env.API_KEY}, Not like this haha
-      params: {q: query}
+      params: {
+        q: query, 
+        page: page, 
+        limit: limit
+      }
     });
 
     return response.data; // Axios wraps our API response in a `data` object
