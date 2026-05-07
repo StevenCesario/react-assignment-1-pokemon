@@ -398,8 +398,6 @@ The structure in `Layout.jsx`[cite: 7] is looking very healthy. The inputs are w
 
 There is just one small missing rail in your routing setup. In `App.jsx`[cite: 2], your `Routes` block covers the index, `collection`, and `create` paths[cite: 2]. But your `SearchPage`[cite: 6] is entirely missing from the router! You will need to make sure you define a route for the search results page, or that Enter key submit won't have a destination to navigate to.
 
----
-
 How are you planning to approach the 500ms debounce requirement within the `Layout` component's lifecycle?
 
 ---
@@ -559,8 +557,6 @@ YOU SAID:
 
 GEMINI SAID:  
 That was a high-leverage 60 minutes. You’ve moved from "deer on ice" to having a professional-grade architectural map[cite: 2, 7]. Ending the block with the territory fully scouted is a massive win for your future "Focus-Steven"[cite: 2].
-
----
 
 ### The Finalized Route Map
 
@@ -887,9 +883,6 @@ const searchTerm = searchParams.get('q');
 *   **Multiple Params**: If your URL grows to `?q=pikachu&type=electric&limit=20`, you can simply call `.get('type')` or `.get('limit')` without doing any complex string math[cite: 6].
 *   **Null Safety**: If the user goes to `/search` with no query at all, `.get('q')` simply returns `null` instead of breaking your app[cite: 6].
 
-
-
----
 
 ### Syncing the Navbar (The Final Stretch)
 You’ve successfully "sent" the data from the `Layout` and "caught" it in the `SearchPage`[cite: 6, 7]. Now, think back to that TODO in your `TODO.txt` about the **Back button**[cite: 7].
@@ -1284,15 +1277,11 @@ export const searchCards = async (query) => {
 };
 ```
 
----
-
 ### 2. The Vite Environment Variable "Gotcha"
 If you are using **Vite** (which `import.meta.env` suggests), there is a security rule you should double-check:
 *   Environment variables must be prefixed with **`VITE_`** to be accessible in your React code.
 *   **Example:** If your file is `.env`, it should say `VITE_API_KEY=your_key_here`. 
 *   If you just named it `API_KEY`, it will return `undefined` in the browser, and the API will likely kick back a 401 Unauthorized error.
-
----
 
 ### 3. Verification
 If the syntax is correct but you still aren't seeing data, check the **Network tab** in your browser's developer tools:
@@ -1340,8 +1329,6 @@ const response = await pokemonAPI.get('/search', {
 });
 ```
 
----
-
 ### A Pre-emptive Nudge for `SearchPage.jsx`
 
 Before you hit save and run into the very next error, I want to save you from a quick JavaScript trap waiting in `SearchPage.jsx`[cite: 10].
@@ -1380,8 +1367,6 @@ GEMINI SAID:
 ## The Dragon Has Landed 🐉
 
 Seeing those **Charizards** render in the browser is a massive milestone! You've successfully built the "Core Loop": **UI Input → URL Update → API Fetch → State Management → UI Render**[cite: 8, 10]. That is the backbone of almost every modern web application.
-
----
 
 ### The Pagination Struggle
 
@@ -2187,8 +2172,6 @@ const data = await searchCards(query, page, limit);
 
 Because you weren't passing the `page` variable to your `api.js` helper, even when the `useEffect` ran, it was calling `searchCards('charizard', undefined, undefined)`, which the API defaults back to Page 1 every time.
 
----
-
 ### The Action Plan for Next Block
 
 1.  **Delete the manual `setPagination`** inside your `handleNextPage` and `handlePrevPage`. Let the URL and the API do the work.
@@ -2234,8 +2217,6 @@ To answer your question about the **pagination state**:
 * **How it works:** Every time your `useEffect` fires (because the URL changed), it hits the API. The API sends back a brand-new `data.pagination` object. You call `setPagination(data.pagination)`, which refreshes your state. 
 * **Why we need it:** This state is what your "Next" and "Previous" buttons look at to decide if they should be `disabled`. It's also how you show the user "Showing results 1-20 of 636."
 
----
-
 ### The Final "Source of Truth" Flow
 
 1.  **Interaction:** User clicks "Next."
@@ -2243,10 +2224,6 @@ To answer your question about the **pagination state**:
 3.  **Reaction:** React notices the URL changed $\rightarrow$ `useEffect` wakes up.
 4.  **Action:** `useEffect` calls `searchCards(query, 2, limit)`.
 5.  **Resolution:** `setSearchResults` and `setPagination` are updated with the **Page 2** data.
-
-
-
----
 
 ### Your Pre-Flight Checklist for the Next Block
 
@@ -2278,14 +2255,10 @@ Because your `useEffect` is listening to the `page` variable in the URL, here is
 4.  **The API Response**: Most Pokémon APIs (including this one) won't "crash." They will simply return an empty `results` array `[]` because there is no data that far out.
 5.  **The UI Update**: Your `searchResults` state becomes `[]`. Since you are mapping over that array, the list simply disappears, and the user sees a blank screen (or whatever "No results" message you’ve built).
 
----
-
 ## Pro-Tip: The "Guardrail" Pattern
 While we can't stop the behavior, we can handle it gracefully. You already have the `pagination` object in your state. In your next block, you could add a "Redirect" or a "Safety Check" like this:
 
 > **The Logic**: If the API comes back and says `total_pages` is 31, but the current `page` is 999, you could automatically trigger a `setSearchParams` to send them back to page 1, or show a big "You've wandered too far into the tall grass!" message.
-
----
 
 ## Final Pre-Flight Check
 Before you dive into the next block to close this loop, remember that your current `SearchPage.jsx` has a tiny "anchor" holding it back. Even though you updated the `useEffect` dependency array, the actual function call inside is still missing the new variables:
@@ -2313,8 +2286,6 @@ That is a classic rite of passage in web development! Hitting a **429 (Too Many 
 
 Since you are locked out of the API for the hour, this is the perfect time to perform some "surgery" on your code to prevent this from happening again once your limit resets.
 
----
-
 ### 1. The "Objects are not valid" React Error
 Your console shows a common React trap: **`Objects are not valid as a React child (found: [object Error])`**.
 
@@ -2329,15 +2300,11 @@ Extract a specific string from that error object so React can render it:
 if (error) return (<p>Error loading page: {error.message || "An unknown error occurred"}</p>)
 ```
 
----
-
 ### 2. Why the 429 happened (and how to stop it)
 There are two main reasons you likely hit that 100-request limit so quickly:
 
 * **The Missing Parameters Loop:** In your current code, `searchCards(query)` was defaulting to page 1 every time. You likely clicked "Next" repeatedly to see if the UI changed, firing a fresh API request with every click, but always getting the same page 1 data back.
 * **The Lack of Debounce:** Every keystroke in your navbar might be triggering a navigation to the Search page, which in turn triggers a `useEffect` fetch. If you type "Charizard" quickly, that’s 9 API requests in under 2 seconds.
-
----
 
 ### 3. Strategy for the Next Focus Block
 When you get back into it, your first priority should be the **500ms debounce**. It is your primary shield against 429 errors. 
