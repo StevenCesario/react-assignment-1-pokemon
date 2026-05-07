@@ -3,3 +3,4 @@
 * set up persistent state across sessions (write to a JSON file that is read on mount?)
 * If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
 * getCardById api function that calls GET /cards/:id
+* Loading state implemented on API requests
