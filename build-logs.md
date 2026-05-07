@@ -1704,3 +1704,51 @@ You just leveled up from "writing code that works" to "writing code that manages
 What's the next move? Do you want to polish the search results UI now that the images are working, or are you heading back to the pagination challenge? 🐉
 
 ---
+
+YOU SAID:  
+I have 6 min left on this focus block.
+Let's hone in on this:
+```
+7. You understand why it works:
+  • where the binary data enters
+  • where conversion happens
+  • what the browser actually needs to display it
+```
+The binary data enters... `const blob = await getCardImage(card.id);` here, no? "Blob" is Binary Large Object. 
+The conversion happens in the line after: `localURL = URL.createObjectURL(blob);`. We're creating.. an object URL. Local URL. I'm gonna see what you wrote up in the chat
+"but you will fill it with a temporary "Blob URL" created in memory." A temporary "Blob URL" created in memory. The `localURL` variable created via `URL.createObjectURL()`is what holds these temporary Blob URLs, aren't they? And they're created in memory. Can we unpack what that means? Do I need to be careful not to render too images many on the screen?
+"Conversion: Use URL.createObjectURL(blob) to turn the binary data into a string the <img> tag understands." Ah right, you also write that this is where the conversion happens
+And what the browser actually needs to display it.. is a standard `<img>` tag with the Blob URL as the `src=`, isn't it?
+58 seconds left haha! Let's crystallize and round off
+
+---
+
+GEMINI SAID:  
+Perfect timing—let’s lock this in before the buzzer. You’ve got the high-level intuition, now let’s "crystallize" the mechanics.
+
+### 1. Where the Binary Data Enters
+You are right: `const blob = await getCardImage(card.id);`.
+Under the hood, Axios receives a stream of raw bytes (0s and 1s) from the Pokémon API. Because you set `responseType: 'blob'`, Axios takes those bytes and puts them into a **Blob** container. It’s like the API sent you a pile of loose LEGO bricks, and the Blob is the box that holds them together so you can move them around in your code.
+
+### 2. Where the "Conversion" Happens
+`URL.createObjectURL(blob)` is the bridge. 
+Crucially, it doesn’t change the image; it **maps** the image. It tells the browser: *"Hey, see that specific box of bytes in RAM? Give me a unique 'nickname' (a string) that points directly to that spot in memory."*
+
+
+
+### 3. What is "Memory" here? (The RAM Factor)
+When you hear "created in memory," it means the image is living in your **RAM**, not your hard drive or a remote server URL. 
+* **The Danger:** If you search for "Charizard" and render 50 cards, you’ve created 50 unique nicknames (Blob URLs) pointing to 50 chunks of RAM. 
+* **The Leak:** If you navigate away and those components disappear but you *don't* call `revokeObjectURL`, those 50 images stay stuck in the user's RAM forever (until they close the tab). This is why your cleanup function is so "Senior-level"—it tells the browser: *"I'm done with this card, you can throw those LEGO bricks away and free up the RAM."*
+
+### 4. What the Browser Needs
+The browser's `<img>` tag is simple—it only knows how to follow a string. It doesn't know what a "Blob" is. By giving it a string that looks like `blob:http://localhost:5173/unique-id`, you are giving it a "Local Address" it can follow to find the data it needs to paint pixels on the screen.
+
+**Summary in 3 steps:**
+1.  **Axios** catches the raw bytes and puts them in a **Blob**.
+2.  **Browser** gives that Blob a temporary **String Address** (URL).
+3.  **React** hands that string to the **`<img>` tag** to draw it.
+
+Block complete. You officially understand the binary-to-UI pipeline! 🐉🚀 See you tomorrow for the next big push!
+
+---
