@@ -28,7 +28,7 @@ const SearchPage = () => {
     const fetchResults = async () => {
       if (!query) return; // Mount case; when there is no query, return early
       try {
-        const data = await searchCards(query);
+        const data = await searchCards(query, page, limit); // THE MISSING PUZZLE PIECE! This one also needs our new page and limit haha!
         setSearchResults(data.results); // This should work
         setPagination(data.pagination); // This also feels correct
       } catch (err) {
@@ -45,7 +45,31 @@ const SearchPage = () => {
   }
 
   function handleNextPage() {
-    // To be implemented
+    // Right, so.. like Gemini said. I'm not gonna look at it yet.. this changes the *URL*. 
+    // So. We need to use `prev` in conjunction with setSearchParams?
+    // setSearchParams(prev => {prev.set('page', page + 1)}); // Like this?? We take whatever `prev` already is.. and we access and change the `page` key.. and increment it by one. Ignoring edge cases for now, let's try it
+    // Nope haha. That chaged the URL from `http://localhost:5173/search?q=charizard` to `http://localhost:5173/search`. Hmmmmm. 
+    // I don't understand why that doesn't work. It should just ignore all the other keys and only override the `page` key? Let's sit 5 min with this and then ask for a nudge.
+    // Looking through all the methods available via Intellisense... set is the only one that makes sense. Is there a nuance to .set() that I'm not considering?
+    // (method) URLSearchParams.set(name: string, value: string): void
+    // The set() method of the URLSearchParams interface sets the value associated with a given search parameter to the given value. 
+    // If there were several matching values, this method deletes the others. If the search parameter doesn't exist, this method creates it.
+    // Hmmmm.. alright, I need a nudge.
+    // The first one was a good attempt! 
+    // setSearchParams(prev => {
+    // return prev.set('page', page + 1)
+    // }); This looks like it would solve it but nope.
+    // It needs to be written like this:
+    setSearchParams(prev => {
+      prev.set('page', page + 1);
+      return prev;
+    });
+
+    // // Are both really necessary? 
+    // setPagination(prev => {
+    //   prev.set('page', pagination.page + 1);
+    //   return prev;
+    // }); Nope. This is not necessary *at all* haha!
   }
 
   if (error) return (<p>Error loading page: {error}</p>)
@@ -56,7 +80,7 @@ const SearchPage = () => {
 
       <ul>
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
-        {searchResults.map(result => < Card card={result} />)}
+        {searchResults.map(result => < Card key={result.id} card={result} />)}
       </ul>
       {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
       <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>

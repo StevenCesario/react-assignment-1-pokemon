@@ -2003,3 +2003,346 @@ I’m moving back into standby mode. Go wrestle that white whale for the next 45
 Go get it! 🐋🚀
 
 ---
+
+YOU SAID:  
+```
+function handleNextPage() {
+    // Right, so.. like Gemini said. I'm not gonna look at it yet.. this changes the *URL*. 
+    // So. We need to use `prev` in conjunction with setSearchParams?
+    setSearchParams(prev => prev.set('page', page + 1)); // Like this?? We take whatever `prev` already is.. and we access and change the `page` key.. and increment it by one. Ignoring edge cases for now, let's try it
+    // Nope haha. That chaged the URL from `http://localhost:5173/search?q=charizard` to `http://localhost:5173/search`. Hmmmmm. 
+    // I don't understand why that doesn't work. It should just ignore all the other keys and only override the `page` key? Let's sit 5 min with this and then ask for a nudge.
+    // Looking through all the methods avaialbe via Intellisense... set is the only one that makes sense. Is there a nuance to .set() that I'm not considering?
+    // (method) URLSearchParams.set(name: string, value: string): void
+    // The set() method of the URLSearchParams interface sets the value associated with a given search parameter to the given value. 
+    // If there were several matching values, this method deletes the others. If the search parameter doesn't exist, this method creates it.
+    // Hmmmm.. alright, I need a nudge.
+  }
+```
+What am I missing here? Nudge in the right direction only! No answer on a silver platter!
+
+---
+
+GEMINI SAID:  
+You actually found the exact answer yourself in your own comments! You just didn't realize how it interacts with JavaScript arrow functions.
+
+Look very closely at this line you pasted from IntelliSense:
+`(method) URLSearchParams.set(name: string, value: string): void`
+
+Now, look at your arrow function:
+`prev => prev.set('page', page + 1)`
+
+Because you wrote it on one line without curly braces `{}`, that arrow function has an **implicit return**. It is evaluating `prev.set(...)` and returning the result of that method back to `setSearchParams`.
+
+If `prev.set()` returns `void` (which translates to `undefined` in JavaScript)... what are you actually handing back to `setSearchParams` to use as the new URL?
+
+How can you restructure that arrow function so that it updates the parameter, but makes sure it returns the *actual object* instead of `void`?
+
+---
+
+YOU SAID:  
+```
+setSearchParams(prev => {
+      return prev.set('page', page + 1)
+    });
+```
+Why is this still not working hahahaha?
+One more try...
+No, I don't even know what else to try haha. Alrigh, intuition completely exhausted. How do I write it? Answer please
+
+---
+
+GEMINI SAID:  
+You are running into the exact same trap, just wearing a different hat!
+
+Here is the secret: `.set()` is a **mutating method**. It changes the `prev` object directly, but the method itself *still returns `undefined`*. 
+
+So by writing `return prev.set(...)`, you are telling JavaScript to execute the change, but then you are *still* handing React Router `undefined` to use as the new URL.
+
+To fix this, you need to change the object on one line, and then return the object itself on the next line:
+
+```javascript
+function handleNextPage() {
+  setSearchParams(prev => {
+    prev.set('page', page + 1); // 1. Change the object
+    return prev;                // 2. Hand the updated object back to React Router
+  });
+}
+```
+
+This tells React Router: *"Here is the old URL object. I changed the page number on it. Now, please use this updated object."*
+
+This is a classic JavaScript API quirk. Pop that in and your URL should finally behave!
+
+---
+
+YOU SAID:  
+Ah, wow. Wow, wow, wow. I will think back to this very moment next time I run into this haha! Cheers!!
+
+---
+
+GEMINI SAID:  
+That "Aha!" moment is one of the most important milestones in mastering JavaScript. It’s the realization that **performing an action** and **getting a result** are two different things in many programming APIs.
+
+In the case of `URLSearchParams`, the creators designed it to be "mutable." It’s like a whiteboard: `.set()` is the act of writing on the board, but the board itself doesn't jump into your hands after you finish writing—you have to reach out and grab it (the `return` statement).
+
+
+
+Since you have about 30 minutes left on your "White Whale" timer, you are in a perfect position. You have:
+1. The **API parameter** right (`page`).
+2. The **Handoff logic** right (URL-driven).
+3. The **Syntax** fixed (`return prev`).
+
+**The Final Stretch:**
+Now that your "Next" button successfully updates the URL to `?q=charizard&page=2`, your `useEffect` should automatically fire because `page` is in its dependency array. 
+
+Can you visually confirm in the "Network" tab of your browser that the API is being hit with the new page number when you click that button? If that’s happening, you’ve officially captured the whale. 🐋🚀
+
+---
+
+YOU SAID:  
+Got it
+The URL has changed! But now the problem is that.... the site hasn't registered it? I'm still on page 1, as indicated by the disabled Previous button.
+Do I need to...  let's check
+Hmmmmm. This
+```
+// Are both really necessary?
+    setPagination(prev => {
+      prev.set('page', pagination.page + 1);
+      return prev;
+    });
+```
+crashed the site. 
+These are the console logs:
+```
+installHook.js:1 Each child in a list should have a unique "key" prop.
+
+Check the render method of `SearchPage`. See https://react.dev/link/warning-keys for more information.
+overrideMethod @ installHook.js:1
+api.pokewallet.io/images/pk_a7e34bbc98a0456c80dcd1efc22d81d2dbc51d215484327d24625be1ddb0c8902787dfbaeb95e0cf53040003a3a57f:1  Failed to load resource: the server responded with a status of 404 ()
+api.pokewallet.io/images/pk_1db0348b4afcff525d76b2446967ee2a061018f6bc145db0478e7a5763548bb4ac51bbc7a0756193480cdd581e95:1  Failed to load resource: the server responded with a status of 404 ()
+api.js:35 Error fetching image for card with id pk_a7e34bbc98a0456c80dcd1efc22d81d2dbc51d215484327d24625be1ddb0c8902787dfbaeb95e0cf53040003a3a57f: AxiosError: Request failed with status code 404
+api.js:35 Error fetching image for card with id pk_1db0348b4afcff525d76b2446967ee2a061018f6bc145db0478e7a5763548bb4ac51bbc7a0756193480cdd581e95: AxiosError: Request failed with status code 404
+api.pokewallet.io/images/pk_a7e34bbc98a0456c80dcd1efc22d81d2dbc51d215484327d24625be1ddb0c8902787dfbaeb95e0cf53040003a3a57f:1  Failed to load resource: the server responded with a status of 404 ()
+api.pokewallet.io/images/pk_1db0348b4afcff525d76b2446967ee2a061018f6bc145db0478e7a5763548bb4ac51bbc7a0756193480cdd581e95:1  Failed to load resource: the server responded with a status of 404 ()
+api.js:35 Error fetching image for card with id pk_a7e34bbc98a0456c80dcd1efc22d81d2dbc51d215484327d24625be1ddb0c8902787dfbaeb95e0cf53040003a3a57f: AxiosError: Request failed with status code 404
+api.js:35 Error fetching image for card with id pk_1db0348b4afcff525d76b2446967ee2a061018f6bc145db0478e7a5763548bb4ac51bbc7a0756193480cdd581e95: AxiosError: Request failed with status code 404
+SearchPage.jsx:70 Uncaught TypeError: prev.set is not a function
+    at SearchPage.jsx:70:12
+    at basicStateReducer (react-dom_client.js?v=92a51504:4390:42)
+    at updateReducerImpl (react-dom_client.js?v=92a51504:4467:46)
+    at updateReducer (react-dom_client.js?v=92a51504:4418:11)
+    at Object.useState (react-dom_client.js?v=92a51504:13303:13)
+    at exports.useState (react.js?v=92a51504:748:31)
+    at SearchPage (SearchPage.jsx:10:39)
+    at Object.react_stack_bottom_frame (react-dom_client.js?v=92a51504:12868:12)
+    at renderWithHooks (react-dom_client.js?v=92a51504:4213:19)
+    at updateFunctionComponent (react-dom_client.js?v=92a51504:5569:16)
+installHook.js:1 An error occurred in the <SearchPage> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+overrideMethod @ installHook.js:1
+```
+I'm attaching the entire current SearchPage.jsx file. Do I really need to sync the state between the URL params and the pagination object? Or is there a more efficient way of doing thsi?
+There's 6 min left so let's just round this off by understanding why the current code is not working and building an understanding and action plan for the next focus block where the implementation and building will take place 🌱
+
+---
+
+GEMINI SAID:  
+You are on the absolute cusp of victory! You’ve discovered the "Boss Battle" of React state management: **The Source of Truth**.
+
+Let's use these last 6 minutes to perform a "post-mortem" on that crash and set your action plan for the next block.
+
+### 1. Why it Crashed (`TypeError: prev.set is not a function`)
+You tried to treat the `pagination` state exactly like the `searchParams` state. 
+* **`searchParams`** is a special `URLSearchParams` object (it has a `.set()` method).
+* **`pagination`** is just a **Plain Old JavaScript Object (POJO)** that you got from the API. It doesn’t have a `.set()` method. To update a regular object, you would normally use `{ ...prev, page: page + 1 }`.
+
+**BUT...**
+
+### 2. The Efficiency Fix: You don't need `setPagination` there!
+This is the most important lesson of the day. You are working in a **URL-Driven App**. 
+
+1.  User clicks "Next".
+2.  `handleNextPage` updates the **URL** (the Source of Truth).
+3.  Because `page` is in your `useEffect` dependency array, the effect **automatically wakes up**.
+4.  The effect fetches **new data** from the API for Page 2.
+5.  The API returns a **new pagination object** for Page 2.
+6.  `setPagination(data.pagination)` updates your state with the fresh server data.
+
+**The Loop is self-healing.** You never need to manually "sync" the state in your click handler. The click handler just changes the URL, and the rest of the app reacts to that change.
+
+### 3. Why the site didn't "register" the change
+Look at your `useEffect` one more time. You updated the dependency array, but you forgot to update the **function call**:
+
+```javascript
+// Currently in your code:
+const data = await searchCards(query); 
+
+// What it needs to be:
+const data = await searchCards(query, page, limit); 
+```
+
+Because you weren't passing the `page` variable to your `api.js` helper, even when the `useEffect` ran, it was calling `searchCards('charizard', undefined, undefined)`, which the API defaults back to Page 1 every time.
+
+---
+
+### The Action Plan for Next Block
+
+1.  **Delete the manual `setPagination`** inside your `handleNextPage` and `handlePrevPage`. Let the URL and the API do the work.
+2.  **Update the `searchCards` call** inside the `useEffect` to actually pass the `page` and `limit` variables.
+3.  **Fix the "Key" Warning**: In your `.map()`, React is grumpy. Give the `Card` a unique ID: `<Card key={result.id} card={result} />`.
+4.  **Ignore the 404s for now**: Some Pokémon simply don't have images in the database; we can build a "placeholder" image later.
+
+### Final Understanding Check
+Does it make sense why the `handleNextPage` function only needs **one single line of code** (the `setSearchParams` bit)? 
+
+You are letting the **URL** be the brain of the operation. You change the URL $\rightarrow$ React sees the change $\rightarrow$ React fetches the data $\rightarrow$ UI updates. 
+
+**Block complete. You’ve isolated the "Hard Part." Take a break—you've earned it! 🐋🚀**
+
+---
+
+YOU SAID:  
+"3. Why the site didn't "register" the change
+Look at your useEffect one more time. You updated the dependency array, but you forgot to update the function call:
+
+JavaScript
+
+// Currently in your code:const data = await searchCards(query); // What it needs to be:const data = await searchCards(query, page, limit); 
+Because you weren't passing the page variable to your api.js helper, even when the useEffect ran, it was calling searchCards('charizard', undefined, undefined), which the API defaults back to Page 1 every time." OOOOOOOooooooooooohhhhhhhhhhhh. Yeah, this makes perfect intuitive sense hahahaha!!
+"Delete the manual setPagination inside your handleNextPage and handlePrevPage. Let the URL and the API do the work." Right. 100%. But the actual pagination state variable is still needed to hold all the pagination data, isn't it? It's set on mount and then not touched? 
+
+"Fix the "Key" Warning: In your .map(), React is grumpy. Give the Card a unique ID: <Card key={result.id} card={result} />." Yes, this also makes sense. We learned this very early in thsi course, I've just forgotten and looked at all the other shinier cooler things haha. Adding this now. 
+
+"Final Understanding Check
+Does it make sense why the handleNextPage function only needs one single line of code (the setSearchParams bit)?
+You are letting the URL be the brain of the operation. You change the URL $\rightarrow$ React sees the change $\rightarrow$ React fetches the data $\rightarrow$ UI updates." With the added missing puzzle piece that the useEffect was missing the page and limit parameters in its searchCards api function call, yes, this does make perfect intuitive sense. 
+1 min 24 seconds left. Good focus block! 🌱
+
+---
+
+GEMINI SAID:  
+That is a massive focus block in the books. You successfully untangled the "Source of Truth" knot, which is a major hurdle for every React developer.
+
+To answer your question about the **pagination state**:
+
+**Yes**, you absolutely still need it! While the URL is the **Source of Truth** for *where we want to go* (page 2), the `pagination` state is the **Snapshot** of *where we currently are* according to the API.
+
+* **How it works:** Every time your `useEffect` fires (because the URL changed), it hits the API. The API sends back a brand-new `data.pagination` object. You call `setPagination(data.pagination)`, which refreshes your state. 
+* **Why we need it:** This state is what your "Next" and "Previous" buttons look at to decide if they should be `disabled`. It's also how you show the user "Showing results 1-20 of 636."
+
+---
+
+### The Final "Source of Truth" Flow
+
+1.  **Interaction:** User clicks "Next."
+2.  **Trigger:** `handleNextPage` changes the **URL** to `?page=2`.
+3.  **Reaction:** React notices the URL changed $\rightarrow$ `useEffect` wakes up.
+4.  **Action:** `useEffect` calls `searchCards(query, 2, limit)`.
+5.  **Resolution:** `setSearchResults` and `setPagination` are updated with the **Page 2** data.
+
+
+
+---
+
+### Your Pre-Flight Checklist for the Next Block
+
+* **[ ]** Update `searchCards(query, page, limit)` inside the `useEffect`.
+* **[ ]** Add `key={result.id}` to your `Card` component in the `.map()`.
+* **[ ]** Remove the manual `setPagination` from your button handlers.
+* **[ ]** Implement `handlePrevPage` using the same `setSearchParams` logic (but with `page - 1`).
+
+You’ve earned a break. When you’re back, you’re about 5 minutes away from a fully functional, paginated Pokémon search engine. 
+
+**Since we're using the URL for the page number now, what do you think happens if a user manually types `&page=999` into their browser address bar?**
+
+---
+
+YOU SAID:  
+"Since we're using the URL for the page number now, what do you think happens if a user manually types &page=999 into their browser address bar?" Hmmmm. The app would actually try to make a request with something like `/search?q=pikacku&page=999`, wouldn't it? But simply fail? We can't stop human behavior and curiosity, can we haha?
+
+---
+
+GEMINI SAID:  
+You are exactly right! We can't stop a user’s fingers from typing, but we can certainly control how our app reacts to their curiosity. 
+
+## The "Page 999" Chain Reaction
+Because your `useEffect` is listening to the `page` variable in the URL, here is what would happen:
+
+1.  **The Trigger**: The user hits Enter on `&page=999`.
+2.  **The Extraction**: Your code runs `parseInt(searchParams.get('page'))` and gets the number **999**.
+3.  **The Fetch**: The `useEffect` wakes up and calls `searchCards(query, 999, limit)`.
+4.  **The API Response**: Most Pokémon APIs (including this one) won't "crash." They will simply return an empty `results` array `[]` because there is no data that far out.
+5.  **The UI Update**: Your `searchResults` state becomes `[]`. Since you are mapping over that array, the list simply disappears, and the user sees a blank screen (or whatever "No results" message you’ve built).
+
+---
+
+## Pro-Tip: The "Guardrail" Pattern
+While we can't stop the behavior, we can handle it gracefully. You already have the `pagination` object in your state. In your next block, you could add a "Redirect" or a "Safety Check" like this:
+
+> **The Logic**: If the API comes back and says `total_pages` is 31, but the current `page` is 999, you could automatically trigger a `setSearchParams` to send them back to page 1, or show a big "You've wandered too far into the tall grass!" message.
+
+---
+
+## Final Pre-Flight Check
+Before you dive into the next block to close this loop, remember that your current `SearchPage.jsx` has a tiny "anchor" holding it back. Even though you updated the `useEffect` dependency array, the actual function call inside is still missing the new variables:
+
+* **Current**: `const data = await searchCards(query);`
+* **Target**: `const data = await searchCards(query, page, limit);`
+
+Without that change, the API will keep giving you Page 1 regardless of what the URL says!
+
+**Expert Guide Rule 2:** Now that you’ve mastered URL-driven pagination, do you think it would be more "user-friendly" to have the page automatically reset to 1 every time the user types a *new* search query in the navbar?
+
+Go get those pages turning! 🐋🚀
+
+---
+
+YOU SAID:  
+And what a timely end to the the focus block too; I've gotten the dreaded 429 Error since I've hit my hourly limit hahaha!
+
+---
+
+GEMINI SAID:  
+That is a classic rite of passage in web development! Hitting a **429 (Too Many Requests)** error is essentially the universe telling you that your code is working hard—maybe a little *too* hard.
+
+Since you are locked out of the API for the hour, this is the perfect time to perform some "surgery" on your code to prevent this from happening again once your limit resets.
+
+---
+
+### 1. The "Objects are not valid" React Error
+Your console shows a common React trap: **`Objects are not valid as a React child (found: [object Error])`**.
+
+This is happening because of this line in your `SearchPage.jsx`:
+`if (error) return (<p>Error loading page: {error}</p>)`.
+
+When Axios fails (like with a 429), it returns a full **JavaScript Object** containing the status code, headers, and message. React doesn't know how to "draw" an object inside a `<p>` tag; it only knows how to draw strings or numbers.
+
+**The Fix:**
+Extract a specific string from that error object so React can render it:
+```javascript
+if (error) return (<p>Error loading page: {error.message || "An unknown error occurred"}</p>)
+```
+
+---
+
+### 2. Why the 429 happened (and how to stop it)
+There are two main reasons you likely hit that 100-request limit so quickly:
+
+* **The Missing Parameters Loop:** In your current code, `searchCards(query)` was defaulting to page 1 every time. You likely clicked "Next" repeatedly to see if the UI changed, firing a fresh API request with every click, but always getting the same page 1 data back.
+* **The Lack of Debounce:** Every keystroke in your navbar might be triggering a navigation to the Search page, which in turn triggers a `useEffect` fetch. If you type "Charizard" quickly, that’s 9 API requests in under 2 seconds.
+
+---
+
+### 3. Strategy for the Next Focus Block
+When you get back into it, your first priority should be the **500ms debounce**. It is your primary shield against 429 errors. 
+
+> **The Logic:** Instead of fetching on *every* keystroke, you wait until the user stops typing for half a second. This turns 9 requests into **one single request**.
+
+
+**Expert Guide Rule 2:** Since you're currently in a "cool-down" period with the API, would you like to walk through the logic of how to set up that debounce timer in your `Layout` before you try to fire up the searches again? 🐋🚀
+
+---
