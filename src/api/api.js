@@ -23,8 +23,10 @@ export const searchCards = async (query) => {
 
 export const getCardImage = async (id) => {
   try {
-    const response = await pokemonAPI.get(`/images/${id}`); // Does not need params
-    return response.data; // I *believe* we can still write like this even tho it will return a jpg?
+    const response = await pokemonAPI.get(`/images/${id}`, {
+      responseType: 'blob' // Binary Large Objects! This will be my first time working with them!
+    }); // "Does not need params"; it does need a responseType haha!
+    return response.data; // I *believe* we can still write like this even tho it will return a jpg? Will be tha actual binary file
   } catch (err) {
     console.log(`Error fetching image for card with id ${id}: ${err}`);
     throw err;
