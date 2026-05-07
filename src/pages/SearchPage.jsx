@@ -9,8 +9,12 @@ const SearchPage = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [pagination, setPagination] = useState({}); // Initialize as empty object, I guess?
   const [error, setError] = useState(null);
-  
+
   const query = searchParams.get('q'); // The actual results array will be here under the key 'results'
+  // These both need to be numbers! Defaults to sensible defaults 1 and 20 if there is nothing present in the URL
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 20;
+
   // const pagination = query.get('pagination'); // I think is gonna have to be a state variable that is also set in the useEffect
   // Will look something like
   // "pagination": {
@@ -23,17 +27,17 @@ const SearchPage = () => {
   useEffect(() => {
     const fetchResults = async () => {
       if (!query) return; // Mount case; when there is no query, return early
-       try {
+      try {
         const data = await searchCards(query);
         setSearchResults(data.results); // This should work
         setPagination(data.pagination); // This also feels correct
-       } catch (err) {
+      } catch (err) {
         setError(err);
-       }
+      }
     };
 
     fetchResults();
-  }, [query]); // This useEffect runs whenever `q=` changes in our URL
+  }, [query, page, limit]); // This useEffect runs whenever `q=` changes in our URL. Now also listens for changes in page and limit! All our "URL" variables
 
   if (error) return (<p>Error loading page: {error}</p>)
 
