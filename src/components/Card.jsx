@@ -62,9 +62,33 @@
 //       "product_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Charizard-ex-V2-sv2a185"
 //   }
 // },
+import { useEffect, useState } from "react"
 import { getCardImage } from "../api/api"
 
 const Card = ({ card }) => {
+  const [imageSrc, setImageSrc] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const blob = await getCardImage(card.id);
+        const localURL = URL.createObjectURL(blob); // This is *completely* foreign to me
+        setImageSrc(localURL);
+      } catch (err) {
+        console.error("Image failed to load");
+        setError(err);
+      }
+    };
+
+    fetchImage();
+
+    // Important cleanup function to prevent memory leaks!
+    return () => {
+      if (imageSrc) URL.revokeObjectURL(imageSrc); // This feels like the clearTimeout to setTimeout haha
+    };
+  }, [card.id]);
+
   return (
     // <li> for now
     <li>
@@ -76,6 +100,11 @@ const Card = ({ card }) => {
       {/* I'm gonna try it in Postman with the id above */}
       {/* The most confusing thing about the images endpoint is that is reutrns a jpg?? And not an image URL? For next focus block */}
       {/* <img  /> */}
+      {imageSrc ? (
+        <img src={imageSrc} alt={card.card_info.name} style={{ width: '150px' }} />
+      ) : (
+        <p>Loading image...</p>
+      )}
     </li>
   )
 }
