@@ -39,6 +39,15 @@ const SearchPage = () => {
     fetchResults();
   }, [query, page, limit]); // This useEffect runs whenever `q=` changes in our URL. Now also listens for changes in page and limit! All our "URL" variables
 
+  // I might find a way to mash these two functions together
+  function handlePrevPage() {
+    // To be implemented
+  }
+
+  function handleNextPage() {
+    // To be implemented
+  }
+
   if (error) return (<p>Error loading page: {error}</p>)
 
   return (
@@ -49,6 +58,10 @@ const SearchPage = () => {
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
         {searchResults.map(result => < Card card={result} />)}
       </ul>
+      {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
+      <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
+      {/* And this one needs to be disabled if we're on page `total_pages`! Sounds good for now */}
+      <button disabled={pagination.page === pagination.total_pages} onClick={handleNextPage}>Next</button>
     </div>
   )
 }
