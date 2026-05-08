@@ -9,6 +9,7 @@ const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchResults, setSearchResults] = useState([]);
   const [pagination, setPagination] = useState({}); // Initialize as empty object, I guess?
+  const [isLoading, setIsLoading] = useState(true); // Took some time to finally implement this haha
   const [error, setError] = useState(null);
 
   const query = searchParams.get('q'); // The actual results array will be here under the key 'results'
@@ -37,6 +38,8 @@ const SearchPage = () => {
         setPagination(data.pagination); // This also feels correct
       } catch (err) {
         setError(err);
+      } finally {
+        setIsLoading(false); // Important: set isLoading to false no matter the result of the fetch
       }
     };
 
@@ -80,8 +83,6 @@ const SearchPage = () => {
     });
   }
 
-  if (error) return (<p>Error loading page: {error.message}</p>)
-
   // Here we handle missing search queries! 🚀
   if (!query) {
     return (
@@ -101,6 +102,9 @@ const SearchPage = () => {
       </div>
     );
   }
+
+  if (isLoading) return (<p>Loading page...</p>) // Will be upgraded if time allows for it
+  if (error) return (<p>Error loading page: {error.message}</p>)
 
   return (
     <div>
