@@ -15,6 +15,7 @@
 * Put Create Custom Card as Explore Cards as "Coming Soon!" in the nav
 * Card image only gallery on Collection page (with the buttons under, just no name or set above the image)
 * Add pricing data to Detailed View page
+* More to be added in SearchResultItem?
 
 If there is time
 * "Slam in" animation from my StickyNote mini project upon creation (highest priority, has a lot of delight per minute haha)

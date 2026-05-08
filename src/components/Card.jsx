@@ -62,14 +62,13 @@
 //       "product_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Charizard-ex-V2-sv2a185"
 //   }
 // },
-import { useEffect, useState } from "react"
 import CardImage from "./CardImage";
 
 const Card = ({ card }) => {
 
   return (
-    // <li> for now
-    <li>
+    // "<li> for now"; now a re-usable <div> that is used in the SearchResult component - *there* we use <li>!
+    <div>
       {/* Let's just start with this */}
       <h2>{card.card_info.name}</h2>
       <h3>Set: {card.card_info.set_name}</h3>
@@ -80,7 +79,7 @@ const Card = ({ card }) => {
       {/* The most confusing thing about the images endpoint is that is reutrns a jpg?? And not an image URL? For next focus block */}
       {/* <img  /> */}
       < CardImage cardId={card.id} cardName={card.card_info.name} />
-    </li>
+    </div>
   )
 }
 

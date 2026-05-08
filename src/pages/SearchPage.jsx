@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom"
 import { searchCards } from "../api/api";
-import Card from "../components/Card";
+// import Card from "../components/Card"; Not used anymore, now uses SearchResultItem instead
+import SearchResultItem from "../components/SearchResultItem";
 
 const SearchPage = () => {
   // const baseURL = "https://api.pokewallet.io/search"; This isn't gonna live here, it's gonna live in api.js!
@@ -84,7 +85,7 @@ const SearchPage = () => {
 
       <ul>
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
-        {searchResults.map(result => < Card key={result.id} card={result} />)}
+        {searchResults.map(result => < SearchResultItem key={result.id} resultItem={result} />)}
       </ul>
       {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
       <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
