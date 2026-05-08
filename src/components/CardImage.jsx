@@ -35,7 +35,7 @@ const CardImage = ({ cardId, cardName }) => {
   return (
     <div>
       {imageSrc ? (
-        <img src={imageSrc} alt={cardName} style={{ width: '150px' }} />
+        <img className="card-image" src={imageSrc} alt={cardName} />
       ) : (
         <p>Loading image...</p>
       )}

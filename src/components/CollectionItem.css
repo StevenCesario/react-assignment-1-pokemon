@@ -105,3 +105,11 @@
   z-index: 10; 
   position: relative;
 }
+
+.card-image {
+  width: 100%; /* Takes up the full width of the grid cell */
+  max-width: 240px; /* Prevents it from getting too massive on weird screen sizes */
+  height: auto;
+  border-radius: var(--radius-md); /* Smooths the physical card edges */
+  box-shadow: var(--shadow-sm);
+}
