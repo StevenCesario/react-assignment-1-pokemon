@@ -92,6 +92,16 @@ const SearchPage = () => {
     );
   }
 
+  // Properly handling the "searching for `sdkvjbnds` Zero Results" edge case too with the same pattern! 
+  if (searchResults.length === 0) {
+    return (
+      <div>
+        <h2>No Pokémon found in the tall grass!</h2>
+        <p>Try with another search query!</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <p>Showing results for "{query}" - {pagination.total} total results</p>
