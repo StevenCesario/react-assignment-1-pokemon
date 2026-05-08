@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getCardById, getCardImage } from '../api/api';
 import CardImage from '../components/CardImage';
 
-const DetailedViewPage = () => {
+const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about having a boolean isInCollection prop here but that can't be calculated without knowing what card we're looking at via the id that is grabbed here on this page from the URL!
   // const params = useParams(); 
   // const id = params.id; // Since we have `<Route path='card/:id' element={<DetailedViewPage />} />`
   const { id } = useParams(); // Neater way to grab it haha
   const location = useLocation(); // This is what allows us to use the Backpack Strat haha!
+  let navigate = useNavigate(); // To allow for automatic navigation to Collection page upon clicking "Add to collection"
 
   // Try to set the initial state using the backpack data. 
   // Using '?.' (optional chaining) to prevent a crash if location.state is null (like on a hard refresh)
   const [card, setCard] = useState(location.state?.cardData || null);
   const [loading, setLoading] = useState(!card); // Our neat starting boolean value: only load if we don't have the card yet
   const [error, setError] = useState(null);
+  // const [isInCollection, setIsInColleciton] = useState(collection.includes()) I'll return to this once I know the definitive shape of a collection card object
+  
+  // .some() returns true if any item in the array matches the condition
+  const isAlreadyOwned = collection.some(c => c.id === card?.id);
 
   // The "Backpack unpacking" strat, i love it 🎒
   useEffect(() => {
@@ -45,6 +50,15 @@ const DetailedViewPage = () => {
       <h1>{card.card_info.name}</h1>
       <p>Set: {card.card_info.set_name}</p>
       < CardImage cardId={card.id} cardName={card.card_info.name} />
+
+      {/* Will eventually be dynamically rendered with {isInCollection? 'Add to Collection' : 'Already in Collection'} */}
+      <button onClick={() => {
+        onAdd(card);
+        navigate('/'); // Redirect to Collection page onClick!
+      }
+      }>
+        Add to collection
+      </button>
     </div>
   )
 }

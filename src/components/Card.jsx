@@ -72,6 +72,7 @@ const Card = ({ card }) => {
     <li>
       {/* Let's just start with this */}
       <h2>{card.card_info.name}</h2>
+      <h3>{card.card_info.set_name}</h3>
 
       {/* Just noticing now that this endpoint... doesn't have images. That's a bummer. Let's check the API docs. */}
       {/* Right. Images have their own endpoint: GET /images/:id with the id under the 'id' key in a results object */}

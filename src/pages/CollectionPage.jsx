@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Card from '../components/Card'
 
 const CollectionPage = ({ collection }) => {
   
@@ -7,7 +8,7 @@ const CollectionPage = ({ collection }) => {
       {collection.length === 0 ? (
         <p>There are no cards in your collection! Add your first card now :)</p>
       ) : (
-        cards.map(card => <Card card={card} />)
+        collection.map(card => <Card key={card.id} card={card} />)
       )}
     </div>
   )
