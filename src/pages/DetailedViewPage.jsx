@@ -17,7 +17,7 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
   const [loading, setLoading] = useState(!card); // Our neat starting boolean value: only load if we don't have the card yet
   const [error, setError] = useState(null);
   // const [isInCollection, setIsInColleciton] = useState(collection.includes()) I'll return to this once I know the definitive shape of a collection card object
-  
+
   // .some() returns true if any item in the array matches the condition
   const isAlreadyOwned = collection.some(c => c.id === card?.id);
 
@@ -64,6 +64,19 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
       }>
         {!isAlreadyOwned ? 'Add to Collection!' : 'Already in Collection'}
       </button>
+
+      {/* New pricing data! */}
+      <div>
+        <h3>Want to add it to your real collection?</h3>
+        <p>Current TCGPlayer market price: ${card.tcgplayer.prices[0].market_price}</p>
+        {/* Will lead to card.tcgplayer.url */}
+        {/* <button>Buy on tcgplayer.com</button> These are not buttons haha!*/} 
+        <a href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a>
+        <p>Average 30 day price on CardMarket.com: ${card.cardmarket.prices[0].avg30}</p>
+        {/* Will lead to card.cardmarket.product_url */}
+        {/* <button>See card at cardmarket.com</button> */}
+        <a href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a>
+      </div>
     </div>
   )
 }

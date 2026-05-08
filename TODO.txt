@@ -1,25 +1,26 @@
 * inCollection boolean state on card in detailed view page DONE
-* If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
 * getCardById api function that calls GET /cards/:id DONE
-* Loading state integrated on API requests
+* Loading state integrated on API requests DONE
 * debouncing DONE
 * Fix "Objects are not valid" React Error DONE
-* "Zero Results" state 
-* Properly handle the blank /search page
+* "Zero Results" state DONE
+* Properly handle the blank /search page DONE
 * !inCollection ? "Add to Collection" : "Already in Collection" button on Detailed View page DONE
 * Automatic redirection from Detailed View page to Collection Page when clicked (CREATE) DONE
 * Keep track of card amount for every card in Collection (UPDATE) DONE
 * Implement "Remove from Collection" (DELETE) DONE
-* Make all cards clickable and direct to detailed view page NEXT PRIORITY
+* Make all cards clickable and direct to detailed view page DONE
 * Vibe code CSS for the entire application to make it presentable
 * Put Create Custom Card as Explore Cards as "Coming Soon!" in the nav
-* Card image only gallery on Collection page (with the buttons under, just no name or set above the image)
-* Add pricing data to Detailed View page
+* Card image only gallery on Collection page (with the buttons under, just no name or set above the image) DONE
+* Add pricing data to Detailed View page DONE
 * More to be added in SearchResultItem?
 * isLoading state for more pages?
+* Optional chaining everywhere we dig in API data?
 
 If there is time
 * "Slam in" animation from my StickyNote mini project upon creation (highest priority, has a lot of delight per minute haha)
+* If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
 * Explore page with 20 randomized cards (take my code from Vibe Salad and make it work in this context!)
 * Not only "Add to Collection"; "Add to Wishlist"!
 * Skeleton Loader!
