@@ -9,8 +9,8 @@
 * Fix "Objects are not valid" React Error
 * Easter Egg page if the `?page=` value is larger than pagination.total_pages 
 * "Zero Results" state
-* Skeleton Loader!
 
 If there is time
 * Explore page with 20 randomized cards (take my code from Vibe Salad and make it work in this context!)
 * Not only "Add to Collection"; "Add to Wishlist"!
+* Skeleton Loader!
