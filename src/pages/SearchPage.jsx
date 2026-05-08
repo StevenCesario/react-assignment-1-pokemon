@@ -84,6 +84,7 @@ const SearchPage = () => {
     });
   }
 
+  // 1. The Empty State: If there is no query, don't even bother checking loading or results.
   // Here we handle missing search queries! 🚀
   if (!query) {
     return (
@@ -94,6 +95,15 @@ const SearchPage = () => {
     );
   }
 
+  // 2. The Loading State: We have a query, but we are waiting for the API.
+  // This intercepts the render BEFORE the empty array can trigger the "Zero Results" state!
+  if (isLoading) return (<p>Loading page...</p>) // Will be upgraded if time allows for it
+
+  // 3. The Error State: The API finished loading, but something went wrong.
+  if (error) return (<p>Error loading page: {error.message}</p>)
+
+  // 4. The Zero Results State: We have a query, we are done loading, there are no errors, 
+  // AND the array is still empty. Now we can safely say nothing was found.
   // Properly handling the "searching for `sdkvjbnds` Zero Results" edge case too with the same pattern! 
   if (searchResults.length === 0) {
     return (
@@ -103,9 +113,6 @@ const SearchPage = () => {
       </div>
     );
   }
-
-  if (isLoading) return (<p>Loading page...</p>) // Will be upgraded if time allows for it
-  if (error) return (<p>Error loading page: {error.message}</p>)
 
   return (
     <div>
