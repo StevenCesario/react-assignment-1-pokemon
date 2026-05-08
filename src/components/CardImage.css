@@ -1,0 +1,8 @@
+/* CardImage.css */
+.card-image {
+  width: 100%; 
+  max-width: 240px; 
+  height: auto;
+  border-radius: var(--radius-md); 
+  box-shadow: var(--shadow-sm);
+}
