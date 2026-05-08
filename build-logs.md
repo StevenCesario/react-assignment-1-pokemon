@@ -5030,3 +5030,77 @@ When you return for the next block, you get to put down the "JavaScript Wrench" 
 **Expert Guide Rule 2:** As you head into the final visual polish phase, do you want to start by converting the `CollectionPage` into that grid of images, or tackle the disabled "Coming Soon" navigation links first? 🚀🎨
 
 ---
+
+YOU SAID:  
+Alright. Final Frontier! 🚀
+```
+Focus Block — 60 min
+
+Quest: sharpen software mastery through real building
+Sub-quest: tie-the-bag MVP pass
+Duration: 60 min
+Difficulty: Final stretch
+
+Definition of done
+
+1. Nav includes disabled “Coming Soon” items in a clean, intentional way
+2. App gets a minimal presentable CSS pass across the main screens
+3. Risky API access paths are guarded where needed with optional chaining / safe fallbacks
+4. Main loading states feel clear and not broken
+5. The main user flow feels coherent end-to-end:
+  • search
+  • open detailed view
+  • add to collection
+  • manage collection
+6. App is in hand-in ready Good Enough v1 state
+
+If finished early with energy left
+7. Add the slam-in animation on newly added collection cards
+
+Constraint
+
+• No new feature rabbits
+• No persistence
+• No unnecessary refactors
+• Ship the coherent version, not the fantasy version
+
+That’s the real final stretch.
+```
+Starting the 60 min timer now.
+This might be cheating haha but I'm gonna start this of wiht asking for your expert discernment. 
+"3. Risky API access paths are guarded where needed with optional chaining / safe fallbacks
+4. Main loading states feel clear and not broken" These two. I want you to assess the current state of the app and where optional chaining and loading states are still needed. Attaching the entire src folder with all relevant files!
+
+---
+
+GEMINI SAID:  
+This is not cheating at all—this is exactly what a senior pair-programmer would do before a release candidate block. You want a fresh set of eyes on the weak points.
+
+Here is the direct assessment of your API risks and loading states so you can patch them quickly and move to CSS.
+
+### 1. The "Hidden Crash" Risks (Optional Chaining)
+
+You did a great job applying optional chaining to the nested prices, but there are three spots where the app is still highly vulnerable to crashing if the API returns incomplete data.
+
+* **The External Links (Critical):** In `DetailedViewPage.jsx`, you have `<a href={card.tcgplayer.url}...>` and `<a href={card.cardmarket.product_url}...>`. If a card doesn't have TCGPlayer data (which happens for some Japanese-only cards), `card.tcgplayer` will be `null`. Trying to read `.url` off `null` will instantly crash the detailed view.
+* *Fix:* Use `card.tcgplayer?.url` and `card.cardmarket?.product_url`. Better yet, use a ternary operator to hide the whole link if the object doesn't exist!
+
+
+* **The Card Component:** In `Card.jsx`, you rely on `card.card_info.name` and `card.card_info.set_name`. While the API *usually* provides this, adding `card.card_info?.name` is bulletproof.
+* **The Dropdown Previews:** The exact same risk exists in `Layout.jsx` where you render `<strong>{card.card_info.name}</strong>` inside the dropdown map.
+
+### 2. The Loading State Assessment
+
+Logically, your loading states are in exactly the right places. They prevent React from crashing while waiting for data.
+
+* **SearchPage:** You successfully implemented the `isLoading` state and set it to `false` in the `finally` block, ensuring it resolves even if there is an error. The `if (isLoading) return (<p>Loading page...</p>)` acts as a solid guard.
+* **DetailedViewPage:** The fallback `loading` state correctly protects the page from rendering `undefined` data if the user refreshes and loses the "Backpack".
+* **CardImage:** The image fetching logic has a very robust `Loading image...` placeholder that prevents blank gaps.
+
+**The UX Polish Verdict on Loading:** Right now, they are technically "not broken," but they don't quite "feel clear" because they are unstyled `<p>` tags shoved to the top left of the screen.
+
+* *Quick Win:* During your CSS pass, create a simple `.loader-text` class that centers the text on the screen, makes it gray, and maybe adds a subtle pulse animation. That transforms a "raw HTML feeling" into an "intentional app feeling" in about 5 lines of CSS.
+
+You have the map. Patch those `href` chains, write some CSS, and tie this bag up! 🚀🐋
+
+---
