@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { searchCards } from '../api/api'; // New pivot; we're going for Goodreads style preview dropdown with no automatic navigation
+import './Layout.css'; // I have unknowingly completely forgotten to import this until now haha!
 
 const Layout = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,7 +88,24 @@ const Layout = () => {
       {/* This is our nav that will be visible and clickable on *EVERY* page. */}
       <nav className="search-nav">
         <Link to="/">My Collection</Link>
-        <Link to="/create">Create Custom Card</Link>
+
+        {/* Intentionally disabled links haha. For now! 🚀 */}
+        <Link
+          to="/explore"
+          className="disabled-link"
+          onClick={(e) => e.preventDefault()}
+          title="Coming Soon!"
+        >
+          Explore Cards
+        </Link>
+        <Link
+          to="/create"
+          className="disabled-link"
+          onClick={(e) => e.preventDefault()}
+          title="Coming Soon!"
+        >
+          Create Custom Card
+        </Link>
         <form onSubmit={handleSubmit}>
           <input type='text' placeholder='Search Pokémon...' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           <button type='submit'>
@@ -116,7 +134,7 @@ const Layout = () => {
                       className="preview-link"
                     >
                       {/* Name and Set info only for now, might create a PreviewItem component so that we can see images here too */}
-                      <strong>{card.card_info?.name}</strong> <br/>
+                      <strong>{card.card_info?.name}</strong> <br />
                       <small className="preview-set-name">{card.card_info.set_name}</small>
                     </Link>
                   </li>
@@ -124,8 +142,8 @@ const Layout = () => {
 
                 {/* The Goodreads-style "See all results" footer */}
                 <li className="preview-footer">
-                  <Link 
-                    to={`/search?q=${searchTerm}`} 
+                  <Link
+                    to={`/search?q=${searchTerm}`}
                     onClick={() => setIsOpen(false)}
                     className="preview-footer-link"
                   >

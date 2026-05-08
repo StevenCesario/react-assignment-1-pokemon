@@ -50,3 +50,15 @@
   text-decoration: none;
   font-weight: bold;
 }
+
+.disabled-link {
+  color: #a0a0a0; /* A nice "inactive" gray */
+  cursor: not-allowed; /* Gives the classic red circle-slash cursor! 🚫 */
+  text-decoration: none; /* Optional: removes the underline to further distinguish it */
+  opacity: 0.7;
+}
+
+.disabled-link:hover {
+  /* You can add a slight shake animation or color change here if you want extra vibe! */
+  color: #888;
+}

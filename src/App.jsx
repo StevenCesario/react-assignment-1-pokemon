@@ -5,6 +5,7 @@ import CollectionPage from './pages/CollectionPage';
 import SearchPage from './pages/SearchPage';
 import EasterEggPage from './pages/EasterEggPage';
 import DetailedViewPage from './pages/DetailedViewPage';
+import ExplorePage from './pages/ExplorePage';
 import CreatePage from './pages/CreatePage';
 
 function App() {
@@ -53,6 +54,9 @@ function App() {
           <Route path='search' element={< SearchPage />} />
           <Route path='card' element={<EasterEggPage />} />
           <Route path='card/:id' element={<DetailedViewPage collection={userCollection} onAdd={addToCollection} />} />
+
+          {/* Intentionally disabled routes haha. For now! 🚀 */}
+          <Route path='explore' element={<ExplorePage />} />
           <Route path='create' element={<CreatePage />} />
         </Route>
       </Routes>
