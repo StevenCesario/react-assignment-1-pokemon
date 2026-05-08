@@ -7,10 +7,9 @@
 * Fix "Objects are not valid" React Error DONE
 * "Zero Results" state
 * !inCollection ? "Add to Collection" : "Already in Collection" button on Detailed View page
-* Automatic redirection from Detailed View page to Collection Page when clicked
+* Automatic redirection from Detailed View page to Collection Page when clicked (CREATE)
 * Keep track of card amount for every card in Collection (UPDATE)
 * Implement "Remove from Collection" (DELETE)
-* Code up the Create Custom Card page and have it also automatically redirect to Collection page upon creation (CREATE)
 * Vibe code CSS for the entire application to make it presentable
 
 If there is time
@@ -21,3 +20,5 @@ If there is time
 * Easter Egg message on `/card`
 * Easter Egg page if the `?page=` value is larger than pagination.total_pages 
 * set up persistent state across sessions (write to a JSON file that is read on mount?)
+* Code up the Create Custom Card page and have it also automatically redirect to Collection page upon creation
+* Re-arrange cards in Collection
