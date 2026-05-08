@@ -4343,3 +4343,124 @@ Enjoy your brain break! You’ve built the skeleton; next time, we give it muscl
 **Expert Guide Rule 2:** When you return to wire up the "Remove" button, do you want to add a simple `window.confirm()` pop-up first to prevent accidental deletions of rare cards, or go straight for the "instant delete" feel? 🚀🌊
 
 ---
+
+YOU SAID:  
+Alright, back after a break. This is our definition of done for these next 45 minutes:
+```
+Focus Block — 45 min
+
+Quest: sharpen software mastery through real building
+Sub-quest: CRUD completion
+Duration: 45 min
+Difficulty: Focused / doable
+
+Definition of done
+
+1. Every CollectionItem has a working Remove from Collection button
+2. Clicking Remove deletes that card from collection state completely
+3. Every CollectionItem has working + and - amount controls
+4. Clicking + increases the card’s amount by 1
+5. Clicking - decreases the card’s amount by 1
+6. The amount can never go below 1
+7. The Collection page re-renders correctly after all update/delete actions
+8. The app’s CRUD loop is now coherent with this simplification:
+  • Create = add card from DetailedView into collection state
+  • Read = render collection from state
+  • Update = change amount
+  • Delete = remove card from collection
+
+Constraint
+
+• No custom-card feature
+• No bonus persistence
+• Prioritize fully working CRUD behavior over polish
+
+That’s a very clean block. Go close the loop.
+```
+All of these CRUD features are things I've practiced with to-do and phonebook apps, now just in a new context and scenario haha! So I'm feeling confident in coding this up. Before we get to that however; I had my brother test the app now during my break. He entered "totodile" in the search bar, hit Enter and... it crashed hahaha:
+```
+api.pokewallet.io/images/pk_9b133b75223722b2f9d8174b08ec926b43de49b02227df0cf2b46828083b34464f2d1487400525ba9136993e8e6bcf:1  Failed to load resource: the server responded with a status of 404 ()
+api.js:35 Error fetching image for card with id pk_9b133b75223722b2f9d8174b08ec926b43de49b02227df0cf2b46828083b34464f2d1487400525ba9136993e8e6bcf: AxiosError: Request failed with status code 404
+api.pokewallet.io/images/pk_9b133b75223722b2f9d8174b08ec926b43de49b02227df0cf2b46828083b34464f2d1487400525ba9136993e8e6bcf:1  Failed to load resource: the server responded with a status of 404 ()
+api.js:35 Error fetching image for card with id pk_9b133b75223722b2f9d8174b08ec926b43de49b02227df0cf2b46828083b34464f2d1487400525ba9136993e8e6bcf: AxiosError: Request failed with status code 404
+react-dom_client.js?v=92a51504:3540 Uncaught Error: Objects are not valid as a React child (found: [object Error]). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectTypeImpl (react-dom_client.js?v=92a51504:3540:10)
+    at throwOnInvalidObjectType (react-dom_client.js?v=92a51504:3544:105)
+    at createChild (react-dom_client.js?v=92a51504:3643:6)
+    at reconcileChildrenArray (react-dom_client.js?v=92a51504:3737:63)
+    at reconcileChildFibersImpl (react-dom_client.js?v=92a51504:3842:106)
+    at react-dom_client.js?v=92a51504:3869:28
+    at reconcileChildren (react-dom_client.js?v=92a51504:5386:46)
+    at beginWork (react-dom_client.js?v=92a51504:6200:1569)
+    at runWithFiberInDEV (react-dom_client.js?v=92a51504:851:66)
+    at performUnitOfWork (react-dom_client.js?v=92a51504:8429:92)
+installHook.js:1 An error occurred in the <p> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+
+overrideMethod @ installHook.js:1
+```
+Let's start this 45 min focus block troubleshooting and fixing this. Attaching all files that are involved. Then we ride that flow momentum and I'll code up the CRUD.
+I'm also at 91/100 in hourly usage, I can see it in my API Dashboard hahaha. So let's be resourceful and efficient in fixing this.
+45 min starting... now! 🚀
+
+---
+
+GEMINI SAID:  
+Ah, the classic "brother testing the app" QA session! They always manage to find the edge cases the second they touch the keyboard.
+
+The good news is that this is a very familiar bug, and it is exactly the same "Senior-Level Bug" we squashed in `SearchPage.jsx` earlier.
+
+### The Diagnosis
+
+Look closely at the React crash log:
+`Uncaught Error: Objects are not valid as a React child (found: [object Error]).`
+
+When your brother searched for "totodile", the API didn't have an image for one of the specific Totodile cards, so it returned a `404 Not Found`.
+
+1. Axios caught that 404 and threw an `AxiosError` **object**.
+2. Your `CardImage.jsx` caught it and saved the object into state: `setError(err)`.
+3. At the bottom of `CardImage.jsx`, you told React to render it: `if (error) return <p>Failed to load image: {error}</p>;`
+
+React panicked because it doesn't know how to render a complex JavaScript object inside a `<p>` tag.
+
+### The Quick Fix
+
+To stop the crash, you just need to point React to a string, or remove the dynamic error rendering entirely. In `CardImage.jsx`, change your error return to this:
+
+```jsx
+  if (error) return <p style={{ fontSize: '12px', color: 'gray' }}>No image available</p>;
+
+```
+
+*(Using a static string like "No image available" is actually a better UX here anyway, as the user doesn't need to see "AxiosError: Request failed with status code 404".)*
+
+### Conserving Your API Requests
+
+Since you are at 91/100 on your hourly usage, **do not refresh the page unnecessarily while testing!** To test your CRUD features (Update and Delete), you don't actually need to fetch new Pokémon. Just use the cards you already have sitting in your `App.jsx` collection state.
+
+Your roadmap for the CRUD loop is absolutely pristine. You know exactly what `App.jsx` needs to do:
+
+* **Update**: `.map()` through the array, find the matching ID, and adjust the `amount`.
+* **Delete**: `.filter()` out the matching ID entirely.
+
+Go ride that momentum and close the loop. 🚀
+
+---
+
+YOU SAID:  
+Got it. Now it just shows a UX friendly "No image available" message, great! I'll get coding! 🚀
+
+!["No image available" message working](screenshots/Screenshot_2026-05-08_10-51-22.png)
+
+---
+
+GEMINI SAID:  
+That looks absolutely perfect! The "No image available" fallback is a massive UX improvement over a hard crash, and now your app is resilient against spotty API data.
+
+You've officially conquered the shape-shifter bug AND the object-render crash. The stage is set.
+
+Keep that momentum going and go wire up that CRUD loop. I'm right here in the corner of the lab when you're ready! 🚀
+
+---

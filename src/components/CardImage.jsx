@@ -30,7 +30,7 @@ const CardImage = ({ cardId, cardName }) => {
     };
   }, [cardId]);
 
-  if (error) return <p>Failed to load image: {error}</p>;
+  if (error) return <p>No image available</p>;
 
   return (
     <div>
