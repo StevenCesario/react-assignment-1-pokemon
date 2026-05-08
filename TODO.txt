@@ -13,7 +13,7 @@
 * Make all cards clickable and direct to detailed view page NEXT PRIORITY
 * Vibe code CSS for the entire application to make it presentable
 * Put Create Custom Card as Explore Cards as "Coming Soon!" in the nav
-* Card image only gallery on Collection page
+* Card image only gallery on Collection page (with the buttons under, just no name or set above the image)
 * Add pricing data to Detailed View page
 
 If there is time
