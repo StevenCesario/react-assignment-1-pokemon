@@ -5,15 +5,15 @@ const pokemonAPI = axios.create({
   headers: {
     'X-API-Key': import.meta.env.VITE_API_KEY // It's up here instead and needs the VITE_ prefix
   }
-}); 
+});
 
-export const searchCards = async (query, page=1, limit=20) => {
+export const searchCards = async (query, page = 1, limit = 20) => {
   try {
     const response = await pokemonAPI.get('/search', {
       // headers: {'X-API-Key': import.meta.env.API_KEY}, Not like this haha
       params: {
-        q: query, 
-        page: page, 
+        q: query,
+        page: page,
         limit: limit
       }
     });
@@ -35,4 +35,14 @@ export const getCardImage = async (id) => {
     console.log(`Error fetching image for card with id ${id}: ${err}`);
     throw err;
   }
-}
+};
+
+export const getCardById = async (id) => {
+  try {
+    const response = await pokemonAPI.get(`/cards/${id}`);
+    return response.data;
+  } catch (err) {
+    console.log(`Error fetching detailed ifno for card with id ${id}: ${err}`);
+    throw err;
+  }
+};
