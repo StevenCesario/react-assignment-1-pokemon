@@ -5477,7 +5477,8 @@ After this we NEED to call this good enough cuz... my brain is mush hahaha!
 ![styled app screenshot #1](screenshots/Screenshot_2026-05-08_16-07-06.png)
 ![styled app screenshot #2](screenshots/Screenshot_2026-05-08_16-07-46.png)
 ![styled app screenshot #3](screenshots/Screenshot_2026-05-08_16-07-54.png)
-![styled app screenshot #4](screenshots/Screenshot_2026-05-08_16-08-04.png)
+![styled app screenshot #4](screenshots/Screenshot_2026-05-08_16-27-04.png)
+![slam-in animation](screenshots/Kooha-2026-05-08-16-12-42.gif)
 
 ---
 
