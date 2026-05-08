@@ -1,10 +1,11 @@
-import Card from "./Card"
+// import Card from "./Card" Not used anymore
+import CardImage from "./CardImage"
 
 const CollectionItem = ({ card, onIncrease, onDecrease, onDelete }) => {
   return (
     <div>
-      {/* The Card component includes the image */}
-      <Card card={card} />
+      {/* Now only includes the image! No Card component for the Name or Set! */}
+      <CardImage cardId={card.id} cardName={card.card_info.name} />
       {/* The onClicks need to be arrow functions since we're passing arguments to keep them as function references! 🚀 */}
       <button disabled={card.amount === 1} onClick={() => onDecrease(card.id)}>-</button>
       <span>Amount: {card.amount}</span>
