@@ -1,8 +1,9 @@
-import Card from "./Card"
+import Card from "./Card";
+import './SearchResultItem.css';
 
 const SearchResultItem = ({ resultItem }) => {
   return (
-    <li>
+    <li className="search-result-item">
       < Card card={resultItem} />
       {/* More to be added here? */}
     </li>

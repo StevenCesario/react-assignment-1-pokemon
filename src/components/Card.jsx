@@ -68,7 +68,7 @@ const Card = ({ card }) => {
 
   return (
     // "<li> for now"; now a re-usable <div> that is used in the SearchResult component - *there* we use <li>!
-    <div>
+    <div className="card-component">
       {/* Let's just start with this */}
       {/* Ended up only using these haha! Now also with optional chaining just to be absolute bulletproof */}
       <h2>{card.card_info?.name}</h2>
