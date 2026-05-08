@@ -16,6 +16,7 @@
 * Add pricing data to Detailed View page DONE
 * More to be added in SearchResultItem?
 * isLoading state for more pages?
+* Optional chaining on pricing API data DONE
 * Optional chaining everywhere we dig in API data?
 
 If there is time

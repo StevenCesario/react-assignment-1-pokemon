@@ -68,11 +68,12 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
       {/* New pricing data! */}
       <div>
         <h3>Want to add it to your real collection?</h3>
-        <p>Current TCGPlayer market price: ${card.tcgplayer.prices[0].market_price}</p>
+        {/* Now with optional chaining implemented */}
+        <p>Current TCGPlayer market price: ${card.tcgplayer?.prices?.[0]?.market_price || 'N/A'}</p>
         {/* Will lead to card.tcgplayer.url */}
         {/* <button>Buy on tcgplayer.com</button> These are not buttons haha!*/} 
         <a href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a>
-        <p>Average 30 day price on CardMarket.com: ${card.cardmarket.prices[0].avg30}</p>
+        <p>Average 30 day price on CardMarket.com: ${card.cardmarket?.prices?.[0]?.avg30 || 'N/A'}</p>
         {/* Will lead to card.cardmarket.product_url */}
         {/* <button>See card at cardmarket.com</button> */}
         <a href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a>
