@@ -63,36 +63,9 @@
 //   }
 // },
 import { useEffect, useState } from "react"
-import { getCardImage } from "../api/api"
+import CardImage from "./CardImage";
 
 const Card = ({ card }) => {
-  const [imageSrc, setImageSrc] = useState(null);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let localURL;
-    let isMounted = true; // Track if the component is still around
-    
-    const fetchImage = async () => {
-      try {
-        const blob = await getCardImage(card.id);
-        if (isMounted) { // Only update state and create URL if still mounted
-          localURL = URL.createObjectURL(blob); // This is *completely* foreign to me
-          setImageSrc(localURL);
-        }
-      } catch (err) {
-        if (isMounted) setError(err);
-      }
-    };
-
-    fetchImage();
-
-    // Important cleanup function to prevent memory leaks!
-    return () => {
-      isMounted = false; // Mark as unmounted
-      if (localURL) URL.revokeObjectURL(localURL); // This feels like the clearTimeout to setTimeout haha
-    };
-  }, [card.id]);
 
   return (
     // <li> for now
@@ -105,11 +78,7 @@ const Card = ({ card }) => {
       {/* I'm gonna try it in Postman with the id above */}
       {/* The most confusing thing about the images endpoint is that is reutrns a jpg?? And not an image URL? For next focus block */}
       {/* <img  /> */}
-      {imageSrc ? (
-        <img src={imageSrc} alt={card.card_info.name} style={{ width: '150px' }} />
-      ) : (
-        <p>Loading image...</p>
-      )}
+      < CardImage cardId={card.id} cardName={card.card_info.name} />
     </li>
   )
 }
