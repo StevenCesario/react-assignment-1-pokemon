@@ -97,7 +97,15 @@ const SearchPage = () => {
 
   // 2. The Loading State: We have a query, but we are waiting for the API.
   // This intercepts the render BEFORE the empty array can trigger the "Zero Results" state!
-  if (isLoading) return (<p>Loading page...</p>) // Will be upgraded if time allows for it
+  if (isLoading) { // "Will be upgraded if time allows for it" Aaaand it's upgraded haha!
+    return (
+      <div className="loader-container">
+        <div className="pokeball-spinner"></div>
+        {/* We can re-use the pulsing loader-text class from Chunk 1! */}
+        <p className="loader-text">Catching data...</p> 
+      </div>
+    );
+  } 
 
   // 3. The Error State: The API finished loading, but something went wrong.
   if (error) return (<p>Error loading page: {error.message}</p>)
