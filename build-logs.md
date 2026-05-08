@@ -5386,3 +5386,85 @@ This is the heart of the app. It currently renders a list of `CollectionItem` co
 
 
 You are all set. Take this over to your CSS session and watch your app come to life! 🚀🎨
+
+---
+
+YOU SAID:  
+Hi again! The entire app is soon styled! One thing I'm noticing as I'm using it is that it's saying "No Pokémon found in the tall grass!" when it should be saying "Loading..." 
+```
+if (isLoading) return (<p>Loading page...</p>) // Will be upgraded if time allows for it
+  if (error) return (<p>Error loading page: {error.message}</p>)
+
+  // Here we handle missing search queries! 🚀
+  if (!query) {
+    return (
+      <div>
+        <h2>Looking for Pokémon?</h2>
+        <p>Use the search bar above to find cards to add to your collection!</p>
+      </div>
+    );
+  }
+
+  // Properly handling the "searching for `sdkvjbnds` Zero Results" edge case too with the same pattern! 
+  if (searchResults.length === 0) {
+    return (
+      <div>
+        <h2>No Pokémon found in the tall grass!</h2>
+        <p>Try with another search query!</p>
+      </div>
+    );
+  }
+```
+The order here matters, doesn't it? Is this the best order we can put them in?
+
+---
+
+GEMINI SAID:  
+You have just hit one of the most classic, fundamental lessons of React rendering logic! The order of those `if` statements matters tremendously because React evaluates them top-to-bottom. The very first `return` statement that evaluates to `true` instantly stops the rest of the component from rendering.
+
+Right now, when your page first loads, `searchResults` is initialized as an empty array `[]`. Because your API takes a few milliseconds to fetch the data, that array stays empty for a brief moment. If the `searchResults.length === 0` check happens *before* the `isLoading` check, React sees the empty array, says "Aha! Zero results!", and returns the tall grass message, completely ignoring the fact that it's still loading.
+
+Here is the absolute best-practice "waterfall" order for your UI states:
+
+```jsx
+  // 1. The Empty State: If there is no query, don't even bother checking loading or results.
+  if (!query) {
+    return (
+      <div>
+        <h2>Looking for Pokémon?</h2>
+        <p>Use the search bar above to find cards to add to your collection!</p>
+      </div>
+    );
+  }
+
+  // 2. The Loading State: We have a query, but we are waiting for the API. 
+  // This intercepts the render BEFORE the empty array can trigger the "Zero Results" state!
+  if (isLoading) return (<p>Loading page...</p>);
+
+  // 3. The Error State: The API finished loading, but something went wrong.
+  if (error) return (<p>Error loading page: {error.message}</p>);
+
+  // 4. The Zero Results State: We have a query, we are done loading, there are no errors, 
+  // AND the array is still empty. Now we can safely say nothing was found.
+  if (searchResults.length === 0) {
+    return (
+      <div>
+        <h2>No Pokémon found in the tall grass!</h2>
+        <p>Try with another search query!</p>
+      </div>
+    );
+  }
+
+  // 5. The Success State: If it survives all the checks above, render the actual results!
+  return (
+    <div>
+      <p>Showing results for "{query}" - {pagination.total} total results</p>
+      {/* ... the rest of your list */}
+
+```
+
+By placing `isLoading` before the zero-results check, you create a "shield" that protects the empty array from being misjudged while the data is still traveling through the network.
+
+Update that order, and your loading state will perfectly bridge the gap between hitting "Search" and seeing the results! 🚀
+
+---
