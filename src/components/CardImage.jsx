@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { getCardImage } from "../api/api"
+import './CardImage.css';
 
 const CardImage = ({ cardId, cardName }) => {
   const [imageSrc, setImageSrc] = useState(null);
