@@ -21,7 +21,7 @@ function App() {
     // To be implemented
   }
 
-  function removeCardFromColletcion(id) {
+  function removeCardFromCollection(id) {
     // To be implemented
   }
 

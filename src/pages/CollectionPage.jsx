@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Card from '../components/Card'
+import CollectionItem from '../components/CollectionItem'
 
 const CollectionPage = ({ collection }) => {
   
@@ -8,7 +8,7 @@ const CollectionPage = ({ collection }) => {
       {collection.length === 0 ? (
         <p>There are no cards in your collection! Add your first card now :)</p>
       ) : (
-        collection.map(card => <Card key={card.id} card={card} />)
+        collection.map(collectionItem => <CollectionItem key={collectionItem.id} card={collectionItem} />)
       )}
     </div>
   )

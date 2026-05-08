@@ -12,6 +12,7 @@
 * Implement "Remove from Collection" (DELETE)
 * Make all cards clickable and direct to detailed view page
 * Vibe code CSS for the entire application to make it presentable
+* Put Create Custom Card as Explore Cards as "Coming Soon!" in the nav
 
 If there is time
 * "Slam in" animation from my StickyNote mini project upon creation (highest priority, has a lot of delight per minute haha)
