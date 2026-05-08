@@ -4638,3 +4638,131 @@ function removeCardFromCollection(id) {
 That Surfing Pikachu is now fully supported by a robust architectural spine. **Go crush those final CRUD features!** 🚀🌊
 
 ---
+
+YOU SAID:  
+And that's Delete also implemented, taking us to full CRUD! I just confirmed in the UI that it works just like it should 🚀
+```
+setUserCollection(userCollection.filter(item => item.id !== id)); // This is it.. isn't it? 
+    // setNotes(notes.filter(note => note.id !== id)); // This is it, isn't it? I made the exact same comment in a mini project hahahaha!
+```
+I love how I had the exact same reaction as I did when coding up StickyCode haha
+It's 17 min left on the focus block timer but I'm gonna stop here. A nice 30 min focus block. Next one I'll set a 60 min timer and we'll essentially speedrun through the rest of what I really want done before handing this in. This is the current TODO list:
+```
+* inCollection boolean state on card in detailed view page DONE
+* getCardById api function that calls GET /cards/:id DONE
+* Loading state integrated on API requests
+* debouncing DONE
+* Fix "Objects are not valid" React Error DONE
+* "Zero Results" state 
+* Properly handle the blank /search page
+* !inCollection ? "Add to Collection" : "Already in Collection" button on Detailed View page DONE
+* Automatic redirection from Detailed View page to Collection Page when clicked (CREATE) DONE
+* Keep track of card amount for every card in Collection (UPDATE) DONE
+* Implement "Remove from Collection" (DELETE) DONE
+* Make all cards clickable and direct to detailed view page
+* Vibe code CSS for the entire application to make it presentable
+* Put Create Custom Card as Explore Cards as "Coming Soon!" in the nav
+
+If there is time
+* "Slam in" animation from my StickyNote mini project upon creation (highest priority, has a lot of delight per minute haha)
+* If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
+* Explore page with 20 randomized cards (take my code from Vibe Salad and make it work in this context!)
+* Not only "Add to Collection"; "Add to Wishlist"!
+* Skeleton Loader!
+* Easter Egg message on `/card`
+* Easter Egg page if the `?page=` value is larger than pagination.total_pages 
+* set up persistent state across sessions (write to a JSON file that is read on mount?)
+* Code up the Create Custom Card page and have it also automatically redirect to Collection page upon creation
+* Re-arrange cards in Collection
+```
+"Make all cards clickable and direct to detailed view page" This will be the higest priority when I return for the next focus block. Right now we can't click the cards on the Search Result page to get to their Detailed View page haha. Here I might create a new SearchResult component that uses <li> to separate it from CollectionItem that should use <div>. And they both use the Card component? (which in turn uses the CardImage component haha). Is this reasonable?
+
+---
+
+GEMINI SAID:  
+That is a massive milestone—**Full CRUD is officially in the books!** You’ve moved from a simple search tool to a living, breathing inventory system where you can add, read, update, and delete. The fact that you hit that flow state and finished a block early is a sign that the React mental models are really starting to stick.
+
+### Is the "SearchResult" Component Reasonable?
+
+It is more than reasonable—it’s **architectural gold**.
+
+Using a shared `Card` component for the visual "core" (name, set, image) and then wrapping it in different "Action Shells" is exactly how you build scalable React apps.
+
+* **`CollectionItem` (`<div>`)**: The "Inventory Shell." It displays the card plus the amount controls and the delete button.
+* **`SearchResult` (`<li>`)**: The "Navigation Shell." It wraps the card in a `<Link>` that takes the user to the `DetailedViewPage`.
+
+This keeps your `Card` component "pure"—it just worries about looking like a Pokémon card—while the parent components decide what clicking on it actually *does*.
+
+### One Small "Logical Nudge" Before You Go
+
+In your `App.jsx`, you have a comment about adding a guard clause to `addToCollection` to prevent duplicates. Since you’ve now mastered the "Amount" update logic, this becomes a very tidy logic puzzle:
+
+1. **Check**: Does `userCollection` already have a card with this ID?
+2. **Match**: If yes, don't add a new item—just run your `increaseAmount` logic on that existing card.
+3. **New**: If no, only then do you spread the new card into the array with `amount: 1`.
+
+### The Roadmap Forward
+
+Your priority list for the next 60-minute "Speedrun" is sharp:
+
+* **Clickable Search Results**: This is the "missing link" that makes the app feel like a real web experience.
+* **Empty States**: Handling the "No Pokémon found in the tall grass" scenario is what separates a student project from a finished product.
+* **Vibe Coding**: Once the logic is a rock-solid spine, the CSS is the "skin" that makes the whole thing feel joyful to use.
+
+Enjoy that well-earned break! When you return, the Logic Spine is done, and it’s time to focus on **Experience** and **Visuals**.
+
+**Expert Guide Rule 2:** When you build the `SearchResult` component, do you want to keep the "Backpack Strat" (passing the card data in `state`) or will you rely on the fallback API fetch on the Detailed View page to keep the code even cleaner? 🚀🐋
+
+---
+
+YOU SAID:  
+"One Small "Logical Nudge" Before You Go
+In your App.jsx, you have a comment about adding a guard clause to addToCollection to prevent duplicates. Since you’ve now mastered the "Amount" update logic, this becomes a very tidy logic puzzle:
+
+Check: Does userCollection already have a card with this ID?
+Match: If yes, don't add a new item—just run your increaseAmount logic on that existing card.
+New: If no, only then do you spread the new card into the array with amount: 1." Right, I completely forgot about this haha! But... is it really needed? If the card is already in the collection, we physically can't add a duplicate since the... oh. It's not disabled haha. I'll make button disabled if `isAlreadyOwned` is true haha!
+"CollectionItem (<div>): The "Inventory Shell." It displays the card plus the amount controls and the delete button.
+SearchResult (<li>): The "Navigation Shell." It wraps the card in a <Link> that takes the user to the DetailedViewPage.
+This keeps your Card component "pure"—it just worries about looking like a Pokémon card—while the parent components decide what clicking on it actually does." I was thinking however that CollectionItems should *also* be wrapped in a <Link> that takes the user to the DetailedViewPage? This is just good UX, isn't it? And I am gonna make a slight adjustment and *only* show the image on the CollectionPage! Meaning it will only have the CardImage component and *not* the Card component. Good thing we have them decoupled! The only thing to think about now on the CollectionPage is that it's only the image if clicked takes the user to the card's DetailedView page
+And since I already *have* all the pricing data, I might as well render it on the DetailedViewPage page haha, adding it to the TODO. See you for the next focus block!
+
+---
+
+GEMINI SAID:  
+That "Defense in Depth" strategy is exactly how robust apps are built. Disabling the button in the UI is your **first line of defense**, but having that guard clause in `App.jsx` is your **safety net** just in case someone finds a way to click that button twice.
+
+Here is a quick breakdown of your new architectural plans for the next block:
+
+### 1. The "Clickable Collection" UX
+
+Making every card in your collection a portal to its `DetailedViewPage` is a high-tier UX move. It transforms your collection from a static list into an interactive album where the user can dive deep into the lore and pricing of any card they own.
+
+### 2. The "Pure Image" Collection View
+
+Decoupling `CardImage` from the full `Card` component is paying off now. By using just the image on the `CollectionPage`, you can create a sleek, "visual-first" gallery that feels like flipping through a real physical binder.
+
+> **A Small Logistical Check**: Since your `CollectionItem.jsx` currently houses the **Amount** and **Remove** buttons, you'll just need to decide where those live once you switch to the "Pure Image" view. Maybe a small "caption" area right under the image, or a stylish hover effect?
+
+### 3. The "Backpack" Pricing Data
+
+Since you've already "packed" the `tcgplayer` and `cardmarket` objects into your state backpack, displaying them on the `DetailedViewPage` is essentially "free" data—no extra API calls needed!
+
+* **TCGPlayer**: You can show the `market_price` and a link to the product URL.
+* **CardMarket**: You can show the `trend` price and the `avg` values to give your users a "market analyst" feel.
+
+---
+
+### Updated Logic Checklist
+
+* **[ ]** **Button Guard**: Wire up the `disabled={isAlreadyOwned}` logic in `DetailedViewPage`.
+* **[ ]** **Collection Links**: Wrap your `CollectionItem` content in a `<Link>` that carries the card data to the detailed view.
+* **[ ]** **Market Data**: Map through those `tcgplayer.prices` on the detailed page to show current values.
+
+You’ve built a solid **Logic Spine**; now you're just adding the "Nerves" and "Senses" that make the app feel alive.
+
+Enjoy your break, and I'll see you for the speedrun!
+
+**One final thought**: Since the `CollectionPage` will eventually have a lot of images, are you planning to add a "Total Collection Value" at the top of the page using the pricing data you've already fetched? 🚀🐋
+
+---

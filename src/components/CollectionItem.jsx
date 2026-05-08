@@ -1,6 +1,6 @@
 import Card from "./Card"
 
-const CollectionItem = ({ card, onIncrease, onDecrease }) => {
+const CollectionItem = ({ card, onIncrease, onDecrease, onDelete }) => {
   return (
     <div>
       {/* The Card component includes the image */}
@@ -9,7 +9,7 @@ const CollectionItem = ({ card, onIncrease, onDecrease }) => {
       <button disabled={card.amount === 1} onClick={() => onDecrease(card.id)}>-</button>
       <span>Amount: {card.amount}</span>
       <button onClick={() => onIncrease(card.id)}>+</button>
-      <button>Remove from collection</button>
+      <button onClick={() => onDelete(card.id)}>Remove from collection</button>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CollectionItem from '../components/CollectionItem'
 
-const CollectionPage = ({ collection, onIncrease, onDecrease }) => {
+const CollectionPage = ({ collection, onIncrease, onDecrease, onDelete }) => {
 
   return (
     <div>
@@ -14,6 +14,7 @@ const CollectionPage = ({ collection, onIncrease, onDecrease }) => {
             card={collectionItem}
             onIncrease={onIncrease}
             onDecrease={onDecrease}
+            onDelete={onDelete}
           />)
       )}
     </div>
