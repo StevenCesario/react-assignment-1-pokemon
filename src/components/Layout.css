@@ -65,6 +65,7 @@
   padding: 0.5rem;
   width: 250px;
   font-size: 0.95rem;
+  color: var(--text-main); /* Tells the input to use the global text color! */
 }
 
 .search-nav form button {

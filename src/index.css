@@ -2,21 +2,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* TCG App Color Palette */
-  --bg-main: #f4f6f8;        /* Soft gray background for the binder page */
-  --card-bg: #ffffff;        /* Pure white for cards */
-  --text-main: #1a1a2e;
-  --text-muted: #64748b;
-  --primary-blue: #3b82f6;   /* A nice vibrant "Link" blue */
-  --primary-hover: #2563eb;
-  --danger-red: #ef4444;
-  --danger-hover: #dc2626;
+  /* Midnight Binder Palette */
+  --bg-main: #0f172a;        /* Deep slate/navy background */
+  --card-bg: #1e293b;        /* Slightly lighter slate for card slots */
+  --text-main: #f8fafc;      /* Crisp white text */
+  --text-muted: #94a3b8;     /* Soft grey-blue for secondary text */
   
-  /* Borders & Shadows */
-  --border-light: #e2e8f0;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  /* Kept the variable name the same so it doesn't break your classes! */
+  --primary-blue: #8b5cf6;   /* Vibrant Master Ball Purple */
+  --primary-hover: #7c3aed;  
+  
+  --danger-red: #f87171;     /* Softer pastel red so it isn't blinding in dark mode */
+  --danger-hover: #ef4444;
+  
+  /* Borders & Shadows tuned for dark mode */
+  --border-light: #334155;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
   --radius-md: 8px;
   --radius-lg: 12px;
 }
