@@ -3720,3 +3720,125 @@ With the API utility and the page routing settled, you have a solid "Fall-throug
 **Expert Guide Rule 2**: Since you are now ready to tackle the "Add to Collection" part of your definition of done, do you plan on storing the user's collection in a simple array in your `App.jsx` state, or are you going to use `localStorage` so the cards are still there when you refresh the browser? 🚀
 
 ---
+
+YOU SAID:  
+Hmmmmm. So let's hone in on this Link that is in Layout.jsx in the dropdown:
+```
+<Link
+                      to={`/card/${card.id}`}
+                      onClick={() => setIsOpen(false)}
+                      className="preview-link"
+                    >
+```
+So we would add `state={{ cardData: card }}`. `card` in this case is the callback in the map: `{previews.map(card => (`.. AH! I believe it just clicked for me haha. I was gonna ask "So how to we make sure that the 'card' object gets filled with data?
+```
+const data = await searchCards(searchTerm, 1, 5);
+setPreviews(data.results || []);`
+```
+That happens here in this case!
+Meaning...
+every `card` object in the map will look something like...
+```
+// A results object will look like:
+// {
+//   "id": "pk_81c533c3a38c4116834f5568f6f60391cd7233f615e695bc9eb1b64eaec2a50b1d13d817a3ebc88ce1312274e8eb19a0",
+//   "card_info": {
+//       "name": "Charizard ex - 185/165",
+//       "clean_name": "Charizard ex 185 165",
+//       "set_name": "SV2a: Pokemon Card 151",
+//       "set_code": "SV2a",
+//       "set_id": "23599",
+//       "card_number": "185/165",
+//       "rarity": "Super Rare",
+//       "card_type": "Fire",
+//       "hp": "330.0",
+//       "stage": "Stage 2",
+//       "card_text": null,
+//       "attacks": [
+//           "[Fire] Brave Wing (60+)<br> If this Pokémon has any damage counters on it, this attack does 100 more damage.",
+//           "[Fire][Fire][Fire][Fire] Explosive Vortex (330)<br> Discard 3 Energy from this Pokémon."
+//       ],
+//       "weakness": "Water x2",
+//       "resistance": null,
+//       "retreat_cost": "2.0"
+//   },
+//   "tcgplayer": {
+//       "prices": [
+//           {
+//               "low_price": 21.26,
+//               "mid_price": 23.89,
+//               "high_price": 49,
+//               "updated_at": "2026-05-06T07:47:29.819843",
+//               "market_price": 22.78,
+//               "direct_low_price": null,
+//               "sub_type_name": "Holofoil"
+//           }
+//       ],
+//       "url": "https://www.tcgplayer.com/product/566528"
+//   },
+//   "cardmarket": {
+//       "product_name": "Charizard ex (sv2a 185)",
+//       "prices": [
+//           {
+//               "avg": 32.92,
+//               "low": 15,
+//               "avg1": 16,
+//               "avg7": 36.54,
+//               "avg30": 33.14,
+//               "trend": 39.88,
+//               "updated_at": "2026-05-06T06:37:34.580284",
+//               "variant_type": "normal"
+//           },
+//           {
+//               "avg": null,
+//               "low": null,
+//               "avg1": null,
+//               "avg7": null,
+//               "avg30": null,
+//               "trend": 0,
+//               "updated_at": "2026-05-06T06:37:34.580284",
+//               "variant_type": "holo"
+//           }
+//       ],
+//       "product_url": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Charizard-ex-V2-sv2a185"
+//   }
+// },
+```
+This that I have at the very top at Card.jsx, no? Is my understanding correct?
+
+---
+
+GEMINI SAID:  
+That "click" you just felt is the sound of the architectural LEGO bricks snapping together! You are exactly right.
+
+### The Data Journey
+
+Because you are fetching the first 5 results in your `Layout.jsx` and storing them in the `previews` state, every item in that array is a complete object containing all the details the API gave you.
+
+* **The Mapping**: When you write `previews.map(card => ...)`, each `card` is a full "record".
+* **The Handoff**: By adding `state={{ cardData: card }}` to your `Link`, you are telling React Router to take that specific, detailed object and carry it over to the next page.
+
+### Verifying the Structure
+
+The JSON structure you provided is exactly what that `card` object looks like. When your `DetailedViewPage` opens that "backpack," it will find:
+
+* **`card.id`**: The unique identifier.
+* **`card.card_info`**: All the text, rarity, and type data.
+* **`card.tcgplayer` & `card.cardmarket**`: The pricing and URL data.
+
+### Why this is a "Speed Hack"
+
+Since you already have this data sitting in your browser's memory after the search, using the "Backpack" method means the `DetailedViewPage` doesn't have to wait for a spinning Poké ball to fetch pricing—it can show those market prices the **millisecond** the page loads.
+
+### A Quick Implementation Check
+
+Just ensure that your `DetailedViewPage` is reaching into the backpack using the **exact same key** you used in the `Link`.
+
+* **In Layout.jsx**: `state={{ cardData: card }}`.
+* **In DetailedViewPage.jsx**: `location.state?.cardData`.
+
+If you use `cardData` in one and just `card` in the other, the backpack will be there, but you'll be looking in the wrong "pocket"!
+
+**Block Timer Update:** You have about **22 minutes** left. You’ve mastered the data handoff; are you ready to build the UI for the `DetailedViewPage` and wire up that "Add to Collection" button? 🚀🐋
+
+---

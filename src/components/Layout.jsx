@@ -111,6 +111,7 @@ const Layout = () => {
                     {/* Clicking a preview closes the dropdown and goes to detail view */}
                     <Link
                       to={`/card/${card.id}`}
+                      state={{ cardData: card }} // Now passes API data in the "backpack" via state haha!
                       onClick={() => setIsOpen(false)}
                       className="preview-link"
                     >
