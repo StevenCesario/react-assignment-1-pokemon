@@ -39,7 +39,7 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/react-assignment-1-pokemon">
       <Routes>
         {/* The Layout wrapper is a wrapper around all of our page routes! */}
         <Route path='/' element={<Layout />}>
