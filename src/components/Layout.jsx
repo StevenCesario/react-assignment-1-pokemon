@@ -87,7 +87,7 @@ const Layout = () => {
     <div>
       {/* This is our nav that will be visible and clickable on *EVERY* page. */}
       <nav className="search-nav">
-        <Link to="/">My Collection</Link>
+        <Link to="/">MyPokéCollection</Link>
 
         {/* Intentionally disabled links haha. For now! 🚀 */}
         <Link
