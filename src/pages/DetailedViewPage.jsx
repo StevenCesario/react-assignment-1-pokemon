@@ -60,7 +60,7 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
         < Card card={card} />
 
         {/* Disabled if the card is already in the collection; no logic clause code needed haha! */}
-        <button disabled={isAlreadyOwned} onClick={() => {
+        <button className="add-to-collection-btn" disabled={isAlreadyOwned} onClick={() => {
           onAdd(card);
           navigate('/'); // Redirect to Collection page onClick!
         }
@@ -75,14 +75,18 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
         <div>
           <h3>Want to add it to your real collection?</h3>
           {/* Now with optional chaining implemented across the board! */}
-          <p>Current TCGPlayer market price: ${card.tcgplayer?.prices?.[0]?.market_price || 'N/A'}</p>
+          <p className="market-stat">Current TCGPlayer market price: <span>${card.tcgplayer?.prices?.[0]?.market_price || 'N/A'}</span></p>
           {/* Will lead to card.tcgplayer.url */}
           {/* <button>Buy on tcgplayer.com</button> These are not buttons haha!*/}
-          {card.tcgplayer?.url ? <a href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a> : <p>TCGPlayer link not available</p>}
-          <p>Average 30 day price on CardMarket.com: ${card.cardmarket?.prices?.[0]?.avg30 || 'N/A'}</p>
+          {card.tcgplayer?.url
+            ? <a className="external-link-btn" href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a>
+            : <p>TCGPlayer link not available</p>}
+          <p className="market-stat">Average 30 day price on CardMarket.com: <span>${card.cardmarket?.prices?.[0]?.avg30 || 'N/A'}</span></p>
           {/* Will lead to card.cardmarket.product_url */}
           {/* <button>See card at cardmarket.com</button> */}
-          {card.cardmarket?.product_url ? <a href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a> : <p>CardMarket link not available</p>}
+          {card.cardmarket?.product_url
+            ? <a className="external-link-btn" href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a>
+            : <p>CardMarket link not available</p>}
         </div>
       </div>
     </div>
