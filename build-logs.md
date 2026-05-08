@@ -3358,3 +3358,334 @@ I’ll be right here in the corner of the lab. If you hit a wall or a weird bug 
 **Go get those LEGO blocks clicked together! 🚀🐋**
 
 ---
+
+YOU SAID:  
+Alright, quick question.
+```
+const [searchParams, setSearchParams] = useSearchParams(); // Not sure if setSearchParams is gonna be used at all but we need to grab the id from the URL
+  const id = searchParams.get('id');
+```
+I clicked one of the preview items and I'm now on `http://localhost:5173/card/pk_483e145e34ce9a6ef081a14381e28c46d734667f747e73cfdd5a0ad5069cc52bdfc2a977acac46ae2a1944bd`. I want the id from the URL, right? But it's not on the form `?id=` so how do I grab it? `const id = searchParams.get('id');` This won't work in this scenario, will it?
+
+---
+
+GEMINI SAID:  
+You've spotted the difference between **Query Parameters** and **URL Path Parameters**!
+
+`useSearchParams` is like a metal detector for everything that comes after the **`?`** in a URL (e.g., `?q=pikachu`). Since your current URL is structured as `/card/pk_abc...`, that ID isn't a query; it’s a **dynamic segment** of the path itself.
+
+To grab that "slug" from the path, you'll want to use a different hook. Look into **`useParams`** from React Router.
+
+**The Logic:**
+
+* **`useSearchParams`**: Used for optional data like search queries or filters (`/search?q=pikachu`).
+* **`useParams`**: Used for required identifiers that are part of the page's "address" (`/card/:id`).
+
+Whatever you named the variable in your route definition (likely **`:id`** inside your `App.jsx` or wherever your routes live) is the key you'll get back from this new hook.
+
+Back to the block! 🚀
+
+---
+
+YOU SAID:  
+Got it!
+```
+const params = useParams(); 
+  const id = params.id; // Since we have `<Route path='card/:id' element={<DetailedViewPage />} />`
+  return (
+    <div>DetailedViewPage for card with ID: {id}</div>
+  )
+```
+This works!
+Another quite important question. Is there any way that I can bypass making a second request to the GET /cards/:id endpoint?
+"""
+Get complete card details with unified pricing from TCGPlayer and CardMarket.
+Parameters:
+ParameterTypeRequiredDescriptionidstringRequiredCard ID - Two formats supported:TCG cards: pk_xxx (with prefix)
+CardMarket-only: hexadecimal hash (no prefix)
+set_codestringOptionalSet code for disambiguation (e.g., "SWSH3", "SV1", "CBB3C"). Supports both alphanumeric codes and numeric group IDs.
+Example Request:
+cURL
+
+curl -H "X-API-Key: pk_live_your_key_here" \
+     "https://api.pokewallet.io/cards/pk_xxx"
+Response Example:
+200 OK
+
+{
+  "id": "pk_xxx",
+  "card_info": {
+    "name": "Charizard VMAX",
+    "clean_name": "Charizard VMAX",
+    "set_name": "Darkness Ablaze",
+    "set_code": "SWSH3",
+    "set_id": "22789",
+    "card_number": "20/189",
+    "rarity": "Secret Rare",
+    "card_type": "Pokemon",
+    "hp": "330",
+    "stage": null,
+    "card_text": "VMAX rule: When your VMAX Pokemon is Knocked Out...",
+    "attacks": ["Fire Spin - 320 damage"],
+    "weakness": "Water",
+    "resistance": null,
+    "retreat_cost": "3"
+  },
+  "tcgplayer": {
+    "url": "https://tcgplayer.com/product/123456",
+    "prices": [
+      {
+        "sub_type_name": "Normal",
+        "low_price": 245.99,
+        "mid_price": 299.99,
+        "high_price": 450.00,
+        "market_price": 285.00,
+        "direct_low_price": 250.00,
+        "updated_at": "2025-12-16T04:00:00Z"
+      }
+    ]
+  },
+  "cardmarket": {
+    "product_name": "Charizard VMAX (Secret)",
+    "product_url": "https://cardmarket.com/product/789012",
+    "prices": [{
+      "variant_type": "normal",
+      "avg": 260.50,
+      "low": 240.00,
+      "trend": 270.00,
+      "avg1": 258.30,
+      "avg7": 255.80,
+      "avg30": 280.50,
+      "updated_at": "2025-12-16T04:00:00Z"
+    }]
+  }
+}
+"""
+If I am *ONLY* interested in this chunk of data:
+```
+"card_info": {
+    "name": "Charizard VMAX",
+    "clean_name": "Charizard VMAX",
+    "set_name": "Darkness Ablaze",
+    "set_code": "SWSH3",
+    "set_id": "22789",
+    "card_number": "20/189",
+    "rarity": "Secret Rare",
+    "card_type": "Pokemon",
+    "hp": "330",
+    "stage": null,
+    "card_text": "VMAX rule: When your VMAX Pokemon is Knocked Out...",
+    "attacks": ["Fire Spin - 320 damage"],
+    "weakness": "Water",
+    "resistance": null,
+    "retreat_cost": "3"
+  },
+```
+which!
+Is available in the /search endpoint!
+"""
+GET /search
+Advanced card search with unified pricing from TCGPlayer and CardMarket.
+Parameters:
+ParameterTypeRequiredDescriptionqstringRequiredSearch query. Supports multiple formats:Card name: charizard, pikachu ex
+Set code: SV2a, SWSH3
+Card number: 148, 148/165
+set_id + card number: 24541 148 — precise lookup using a numeric set ID and card number
+pagenumberOptionalPage number (default: 1)limitnumberOptionalResults per page (default: 20, max: 100)
+Example Requests:
+cURL — Search by name
+
+curl -H "X-API-Key: pk_live_your_key_here" \
+     "https://api.pokewallet.io/search?q=charizard+ex"
+cURL — Search by set_id + card number (precise lookup)
+
+curl -H "X-API-Key: pk_live_your_key_here" \
+     "https://api.pokewallet.io/search?q=24541%20148"
+Response Example (TCG Card):
+200 OK
+
+{
+  "query": "pikachu",
+  "results": [
+    {
+      "id": "pk_72046138a4c1908a9f27c93fdd8189ba4ac8e683efaed6b9161efcef129302394a9ec1d20d",
+      "card_info": {
+        "name": "Pikachu ex (Pikachu 60)",
+        "clean_name": "Pikachu ex Pikachu 60",
+        "set_name": "Battle Academy 2024",
+        "set_code": "BA2024",
+        "set_id": "23520",
+        "card_number": "106",
+        "rarity": "Holo Rare",
+        "card_type": "Lightning",
+        "hp": "200.0",
+        "stage": "Basic",
+        "card_text": null,
+        "attacks": ["[LLC] Thunderbolt (120)"],
+        "weakness": "Fx2",
+        "resistance": null,
+        "retreat_cost": "1.0"
+      },
+      "tcgplayer": {
+        "prices": [{
+          "sub_type_name": "Normal",
+          "low_price": 7,
+          "mid_price": 9.37,
+          "high_price": 18,
+          "market_price": 8.01,
+          "direct_low_price": null,
+          "updated_at": "2025-12-27T05:14:43.451818"
+        }],
+        "url": "https://www.tcgplayer.com/product/556443"
+      },
+      "cardmarket": null
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 56,
+    "total_pages": 3
+  },
+  "metadata": {
+    "total_count": 56,
+    "tcg": 18,
+    "cardmarket": 38,
+    "tcg_only": 18,
+    "cardmarket_only": 38,
+    "both_sources": 0
+  }
+}
+"""
+Can we cache it or something similar somehow?
+
+---
+
+GEMINI SAID:  
+That is a fantastic "Senior Developer" intuition! Why pay for the same data twice when you already have it in your pocket?
+
+There are two primary ways to "smuggle" that data from your search results into your detailed view without hitting the API again.
+
+### 1. The "Backpack" Method (Location State)
+
+React Router allows you to attach a **`state`** object to your `Link` component. Think of this like putting the card data into the user's backpack as they walk through the door to the detailed page.
+
+* **How it works**: When you define your `Link` in the search result, you don't just give it a `to` path; you also give it a `state` property containing the `card` object.
+* **Retrieval**: On the `DetailedViewPage`, you use a hook called **`useLocation`** to reach into that "backpack" and grab the data.
+* **The Catch (The Refresh Trap)**: If the user refreshes the page while on the detailed view, the "backpack" is emptied. In that specific scenario, your component would need a fallback logic to say: "If I don't have the data from state, *then* go fetch it from the API."
+
+### 2. The "Library" Method (Global Context / Zustand)
+
+Since one of your goals is to "Add to Collection," you are eventually going to need a central place to store that collection anyway.
+
+* **How it works**: You store your search results in a **Global State** (like React Context or a library like Zustand).
+* **Retrieval**: The `DetailedViewPage` simply looks at that global list and says, "Hey, does anyone have the info for ID `pk_123`?"
+* **Benefit**: This makes the "Add to Collection" feature much easier because you're already working in a shared space.
+
+---
+
+### Which one fits your 60-minute block?
+
+The **Location State** method is the fastest way to "bypass" the request for this specific session. However, since you eventually want an "Add to Collection" feature that persists, you might find that having a **Shared State** (Context) for your results and your collection is the more robust "LEGO" foundation.
+
+> **One final nudge on the "Detailed" endpoint**: Look closely at the Response Example for the `/cards/:id` endpoint. It includes **TCGPlayer and CardMarket pricing arrays** that are much more detailed than what the `/search` endpoint provides. If you want those price charts or specific market trends later, the second request becomes a necessity!
+
+How does that "Backpack" vs. "Library" analogy sit with your current plan? 🚀🐋
+
+---
+
+YOU SAID:  
+"The Catch (The Refresh Trap): If the user refreshes the page while on the detailed view, the "backpack" is emptied. In that specific scenario, your component would need a fallback logic to say: "If I don't have the data from state, then go fetch it from the API."" Mmmmm. If we are unable to get the data from state, *only then* go fetch it from the API. Alright!
+We haven't touched upon Global Context (only useContext for login and theme) or Zustand at all in the course so it's nice knowing that's available but let's stick with the Backpack method haha! 
+How would this look like in code?
+
+---
+
+GEMINI SAID:  
+The "Backpack" method is perfect for this. It keeps your scope tight and does exactly what you need without overcomplicating the architecture.
+
+To make this work, you have to wire up two sides: the **Sender** (where the user clicks) and the **Receiver** (the detailed view page).
+
+### 1. The Sender (Your Link)
+
+Wherever you have your `<Link>` component (in your `Card.jsx` and in your new dropdown `PreviewItem`), you need to add the `state` prop. This is how you slip the data into the backpack.
+
+```jsx
+import { Link } from 'react-router-dom';
+
+// Assuming 'card' is the object containing all the API data for this specific Pokemon
+<Link 
+  to={`/card/${card.id}`} 
+  state={{ cardData: card }} 
+>
+  View Details
+</Link>
+
+```
+
+### 2. The Receiver (DetailedViewPage.jsx)
+
+On the receiving end, you use the `useLocation` hook to open the backpack.
+
+The magic here is combining `useState`'s initial value with an `if/else` logic in your `useEffect`.
+
+```jsx
+import { useState, useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
+import { getCardById } from '../api/api'; // Assuming you have a function like this for the fallback
+
+const DetailedViewPage = () => {
+  const { id } = useParams(); // Grab the ID from the URL
+  const location = useLocation(); // Open the backpack
+
+  // Try to set the initial state using the backpack data. 
+  // The '?.' (optional chaining) prevents a crash if location.state is null (like on a hard refresh).
+  const [card, setCard] = useState(location.state?.cardData || null);
+  const [loading, setLoading] = useState(!card); // Only load if we don't have the card yet
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // If the backpack had the data, we do absolutely nothing! Bypass complete.
+    if (card) return; 
+
+    // FALLBACK: The backpack was empty (user refreshed or shared the direct link)
+    const fetchCardFallback = async () => {
+      try {
+        setLoading(true);
+        const data = await getCardById(id); // Hit the /cards/:id endpoint
+        setCard(data);
+      } catch (err) {
+        setError(err.message || "Failed to fetch card details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCardFallback();
+  }, [id, card]); // Re-run if the ID changes
+
+  if (loading) return <p>Loading Pokémon data...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!card) return <p>No card found.</p>;
+
+  return (
+    <div>
+      <h1>{card.card_info.name}</h1>
+      <p>Set: {card.card_info.set_name}</p>
+      {/* ... the rest of your detailed UI and the Add to Collection button ... */}
+    </div>
+  );
+};
+
+export default DetailedViewPage;
+
+```
+
+### Why this is robust:
+
+1. **The Fast Path**: When they click from the search page, `location.state.cardData` exists. `useState` initializes with it, `loading` starts as `false`, and the `useEffect` returns immediately. Instant load!
+2. **The Safe Path**: If they bookmark `/card/pk_123` and open it tomorrow, `location.state` is null. `useState` initializes as `null`, `loading` starts as `true`, and the `useEffect` fires the Axios request to save the day.
+
+Go get that "Add to Collection" wired up! 🚀
+
+---
