@@ -8,6 +8,7 @@ Finns tillgänglig på https://stevencesario.github.io/react-assignment-1-pokemo
 För det första; ja, alla commits har gjorts direkt till main och det är ganska kaos i commitsen all in all hahaha.  
 Jag har prioriterat att koda så mycket som möjligt från intuition, förstå och lära mig allt nytt och ha så kul som möjligt. Och detta vill jag säga att jag lyckats bra med!  
 Myyyycket tid lades i början på Router-arkitekturen och att förstå det. Och det blev även en grej som itererades på under hela projektets gång.  
+Hela projektets Gemini chat historik finns i [Build Logs](build-logs.md)!  
 
 Några av de allra största brain chemistry altering moments under projektets gång:  
 * Lifting state up: collections state arrayen ska inte ligga i CollectionPage.jsx, den ska ligga i App.jsx!
