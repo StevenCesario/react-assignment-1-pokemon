@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams, Link } from "react-router-dom"
 import { searchCards } from "../api/api";
 // import Card from "../components/Card"; Not used anymore, now uses SearchResultItem instead
 import SearchResultItem from "../components/SearchResultItem";
@@ -82,10 +82,10 @@ const SearchPage = () => {
   return (
     <div>
       <p>Showing results for "{query}" - {pagination.total} total results</p>
-
       <ul>
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
-        {searchResults.map(result => < SearchResultItem key={result.id} resultItem={result} />)}
+        {/* Now wrapped in a Link that sends the user to the Detailed view page, of course with the Backpack strat fully intact haha! 🚀 */}
+        {searchResults.map(result => <Link to={`/card/${result.id}`} state={{ cardData: result }} >< SearchResultItem key={result.id} resultItem={result} /></Link>)}
       </ul>
       {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
       <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
