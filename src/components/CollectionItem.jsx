@@ -5,7 +5,7 @@ import './CollectionItem.css';
 
 const CollectionItem = ({ card, onIncrease, onDecrease, onDelete }) => {
   return (
-    <div className="collection-item">
+    <div className={`collection-item ${card.isNew ? 'animate-in' : ''}`}>
       {/* Now only includes the image! No Card component for the Name or Set! */}
       {/* Now also clickable! 🚀 */}
       <Link to={`/card/${card.id}`} state={{ cardData: card }} ><CardImage cardId={card.id} cardName={card.card_info.name} /></Link>

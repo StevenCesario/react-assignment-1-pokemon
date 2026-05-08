@@ -15,7 +15,7 @@ function App() {
     // "Will also have guard clause logic to not allow for duplicates."" Not needed!
     // setUserCollection([...userCollection, {id: card.id, name: card.card_info.name, set_name: card.card_info.set_name, amount: 1}]); Attemp 1. It's good but...
     // ... we can do better with a double spread operator haha!
-    setUserCollection([...userCollection, { ...card, amount: 1 }]);
+    setUserCollection([...userCollection, { ...card, amount: 1, isNew: true }]);
   }
 
   function increaseAmount(id) {
