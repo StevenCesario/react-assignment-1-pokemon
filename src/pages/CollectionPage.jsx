@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import CollectionItem from '../components/CollectionItem'
+import './CollectionPage.css';
 
 const CollectionPage = ({ collection, onIncrease, onDecrease, onDelete }) => {
+  const collectionSize = collection.length;
 
   return (
-    <div>
-      {collection.length === 0 ? (
+    <div className={collectionSize === 0 ? "empty-collection" : "collection-grid"}>
+      {collectionSize === 0 ? (
         <p>There are no cards in your collection! Add your first card now :)</p>
       ) : (
         collection.map(collectionItem =>
