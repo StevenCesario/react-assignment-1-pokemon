@@ -116,7 +116,7 @@ const Layout = () => {
                       className="preview-link"
                     >
                       {/* Name and Set info only for now, might create a PreviewItem component so that we can see images here too */}
-                      <strong>{card.card_info.name}</strong> <br/>
+                      <strong>{card.card_info?.name}</strong> <br/>
                       <small className="preview-set-name">{card.card_info.set_name}</small>
                     </Link>
                   </li>
