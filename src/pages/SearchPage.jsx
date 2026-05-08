@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom"
 import { searchCards } from "../api/api";
 // import Card from "../components/Card"; Not used anymore, now uses SearchResultItem instead
 import SearchResultItem from "../components/SearchResultItem";
+import './SearchPage.css';
 
 const SearchPage = () => {
   // const baseURL = "https://api.pokewallet.io/search"; This isn't gonna live here, it's gonna live in api.js!
@@ -109,16 +110,18 @@ const SearchPage = () => {
   return (
     <div>
       <p>Showing results for "{query}" - {pagination.total} total results</p>
-      <ul>
+      <ul className="search-results-grid">
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
         {/* Now wrapped in a Link that sends the user to the Detailed view page, of course with the Backpack strat fully intact haha! 🚀 */}
         {/* The outermost child is the one that needs the `key` property when using .map() which now with this wrapping is Link! Good to know */}
         {searchResults.map(result => <Link key={result.id} to={`/card/${result.id}`} state={{ cardData: result }} >< SearchResultItem resultItem={result} /></Link>)}
       </ul>
       {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
-      <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
-      {/* And this one needs to be disabled if we're on page `total_pages`! Sounds good for now */}
-      <button disabled={pagination.page === pagination.total_pages} onClick={handleNextPage}>Next</button>
+      <div className="pagination-controls">
+        <button className="pagination-btn" disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
+        {/* And this one needs to be disabled if we're on page `total_pages`! Sounds good for now */}
+        <button className="pagination-btn" disabled={pagination.page === pagination.total_pages} onClick={handleNextPage}>Next</button>
+      </div>
     </div>
   )
 }
