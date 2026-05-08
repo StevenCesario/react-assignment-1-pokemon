@@ -1,5 +1,4 @@
 * inCollection boolean state on card in detailed view page
-* set up persistent state across sessions (write to a JSON file that is read on mount?)
 * If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
 * getCardById api function that calls GET /cards/:id DONE
 * Loading state integrated on API requests
@@ -15,9 +14,10 @@
 * Vibe code CSS for the entire application to make it presentable
 
 If there is time
-* "Slam in" animation from my StickyNote mini project upon creation
+* "Slam in" animation from my StickyNote mini project upon creation (highest priority, has a lot of delight per minute haha)
 * Explore page with 20 randomized cards (take my code from Vibe Salad and make it work in this context!)
 * Not only "Add to Collection"; "Add to Wishlist"!
 * Skeleton Loader!
 * Easter Egg message on `/card`
 * Easter Egg page if the `?page=` value is larger than pagination.total_pages 
+* set up persistent state across sessions (write to a JSON file that is read on mount?)
