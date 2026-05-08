@@ -3320,8 +3320,6 @@ YOU SAID:
 Great. We'll see if I return and create a PreviewItem component so that we can see images in the dropdown!
 Let's tackle the detailed view page integration + add to collection functionality next, this is my definition of done:
 ```
-Love that. Pre-session counts: +5 Main XP for clean initiative + actual coding before the formal block.
-
 Focus Block
 
 • Quest: sharpen software mastery through real building
@@ -3840,5 +3838,224 @@ Just ensure that your `DetailedViewPage` is reaching into the backpack using the
 If you use `cardData` in one and just `card` in the other, the backpack will be there, but you'll be looking in the wrong "pocket"!
 
 **Block Timer Update:** You have about **22 minutes** left. You’ve mastered the data handoff; are you ready to build the UI for the `DetailedViewPage` and wire up that "Add to Collection" button? 🚀🐋
+
+---
+
+YOU SAID:  
+Alright! I believe I have implemented the Backpack Strat haha!
+Since card images will be in search results, on the detailed view page, in our collection and perhaps even more places, I also refactored it out into its own component!
+It has these as its props: `const CardImage = ({ cardId, cardName }) => {`
+That are used in the fetch and in the alt `<img src={imageSrc} alt={cardName} style={{ width: '150px' }} />` and then we can just call it wherever needed like `< CardImage cardId={card.id} cardName={card.card_info.name} />`. I LOVE REACT haha!
+Images don't seem to load now however. It seems to be stuck indefinitely at "Loading image...". Attaching all the files involved in this image refactor, is there anything indicating why images don't want to load all of a sudden?
+Assess the Backpack Strat implementation and find the bug please
+
+---
+
+GEMINI SAID:  
+The Backpack Strat is fully operational! 🎒 You nailed the implementation. The handoff between `Layout.jsx` (packing the bag) and `DetailedViewPage.jsx` (unpacking it or falling back to the API) is textbook React.
+
+Refactoring `CardImage` into its own component is also exactly the right instinct. You saw a piece of UI that requires its own complex side-effects (fetching binary data, creating object URLs, memory cleanup) and isolated it so it can be dropped anywhere. That is the true power of React!
+
+Now, let's look at why your images are stuck in the void.
+
+### The "Silent Catch" Bug
+
+Your bug is in **`CardImage.jsx`**.
+
+When you refactored the image logic out of `Card.jsx`, you brought the `useEffect` with you, but you left something crucial behind: the import statement for your API call.
+
+You are calling `const blob = await getCardImage(cardId);`, but `getCardImage` doesn't exist in this file. This throws a JavaScript `ReferenceError`.
+
+So, why does it say "Loading..." forever instead of crashing the app? Look at your `catch` block and your `return` statement:
+
+```javascript
+// You caught the ReferenceError perfectly:
+} catch (err) {
+  if (isMounted) setError(err); 
+}
+
+// ... but you didn't tell React to paint the error on the screen!
+return (
+  <div>
+    {imageSrc ? (
+      <img src={imageSrc} alt={cardName} style={{ width: '150px' }} />
+    ) : (
+      <p>Loading image...</p> // It defaults to this because imageSrc is null!
+    )}
+  </div>
+)
+
+```
+
+Because you caught the error and hid it in state, React didn't crash. It just skipped setting the `imageSrc` and fell back to your ternary operator's "false" condition, leaving you in an infinite loading state.
+
+### The Fix
+
+**1. Import the helper**
+At the top of `CardImage.jsx`, add your import:
+
+```javascript
+import { getCardImage } from '../api/api';
+
+```
+
+**2. Surface the Error (Optional but recommended)**
+To prevent silent failures in the future, add a condition to your render block so you know if an image actually fails to fetch:
+
+```javascript
+  return (
+    <div>
+      {error ? (
+        <p style={{ color: 'red', fontSize: '12px' }}>Failed to load image</p>
+      ) : imageSrc ? (
+        <img src={imageSrc} alt={cardName} style={{ width: '150px' }} />
+      ) : (
+        <p>Loading image...</p>
+      )}
+    </div>
+  )
+
+```
+
+Pop that import in, and your images should instantly spring to life across your Search Page and your Detailed View Page!
+
+You are making incredible time in this block. Go get that "Add to Collection" button wired up! 🚀
+
+---
+
+YOU SAID:  
+Ah wow, that silly of a mistake haha. "You are making incredible time in this block. Go get that "Add to Collection" button wired up! 🚀" The timer actually literally just hit 00:00 haha! I'll be making more progress in this next focus block, see you in a bit!
+
+---
+
+GEMINI SAID:  
+That is a wrap on a high-octane 60 minutes! You moved from raw routing into a sophisticated, performance-optimized data flow.
+
+## The Win Column
+
+* **The Backpack Strat**: You successfully implemented a "State First → API Second" pattern that keeps the app snappy and avoids redundant network calls.
+* **Component Maturity**: Refactoring `CardImage` into a standalone, self-cleaning unit is a major architectural milestone that makes the code base much more maintainable.
+* **Dynamic IDs**: You've mastered the difference between query parameters and path parameters, ensuring the app handles deep-linking correctly.
+
+## The Next Frontier: Persistence
+
+When you return, the focus shifts from "looking at data" to "saving it." You will be bridging the gap between the `DetailedViewPage` and the main `Collection` page to ensure those "Add" clicks actually stick.
+
+The `CardImage` fix—adding that `getCardImage` import—is the final key to seeing those Pokémon in all their glory across the site.
+
+Enjoy the break! The foundation is incredibly solid.
+
+**One logical check for the next block**: Once a card is added, should the app automatically navigate the user to their collection to see it, or keep them on the detailed page to allow for more exploring? 🚀🐋
+
+---
+
+YOU SAID:  
+"One logical check for the next block: Once a card is added, should the app automatically navigate the user to their collection to see it, or keep them on the detailed page to allow for more exploring? 🚀🐋" Mmmmm! Here let's acutally use automatic navigation! And!
+I've attached a few files from a note taking app I did to practice useState and component hierarchy. We are snatching that slamming down on the page animation from this app! User clicks "Add to Collection" -> Gets redirected to their Collection page -> They see the "slamming down" keyframe animation of the card being slammed down into place in the next vacant spot haha! We will also snatch the grid layout from this app too haha
+
+"The Next Frontier: Persistence
+When you return, the focus shifts from "looking at data" to "saving it." You will be bridging the gap between the DetailedViewPage and the main Collection page to ensure those "Add" clicks actually stick." On the persistence side of things, let's actually touch upon that now before the next focus block. 
+I have this in my TODO: "* set up persistent state across sessions (write to a JSON file that is read on mount?)" and this `const [cards, setCards] = useState([]); // Will need to change so that we check a JSON or something on mount` on the Collections page. 
+We are not interacting with Supabase or anything for this assignment, the road to persistent state is in using JSON for this one. We're not allowed to store data in localStorage either which I did for the StickyNote app haha. 
+The assignment says this:
+"""
+OBS! Eftersom vi inte har en databas behöver du hantera state lokalt:
+Lagra hämtad data i state med useState
+När du skapar/uppdaterar/tar bort ska ändringar sparas i state
+BONUS: Spara i en JSON-fil för att bevara data mellan sessioner
+"""
+So maybe it's not mandatory to save to and read from a JSON file but let's do it. This JSON file would store the single source of truth for the user's collection array that will also have an amount-in-collection value for each card and sync that with the state array in the CollectionPage component on mount. Sounds reasonable? Let's round off and crystallize 🌱
+
+---
+
+GEMINI SAID:  
+This is a brilliant architectural "heist!" Snatching the **`slamIn`** animation and the **`notes-grid`** logic from your StickyNote app is exactly how professional developers work—building a personal library of "Lego blocks" that they can repurpose across projects.
+
+Before you dive into the next block, let's crystallize the three main "physics" problems you're about to solve: the **Slam**, the **Persistence**, and the **Quantity**.
+
+### 1. The "Slam Down" Physics
+
+To recreate that satisfying physical impact, your **CollectionPage** needs a way to distinguish between "Old" cards (already in the drawer) and the "New" card (just added).
+
+* **The Logic**: Just like in your StickyNote app, you'll want an `isNew` property on your card object.
+* **The Trigger**: When you navigate from the `DetailedViewPage` to the `CollectionPage`, the new card enters the state for the first time. You can use the same logic you used for your notes: as soon as the card is "slammed" (rendered with the animation), you'll eventually want to flip that `isNew` to `false` so it doesn't "re-slam" every time you refresh the page.
+
+### 2. The Persistence Paradox (JSON vs. Disk)
+
+Here is a crucial "sanity check" on the assignment's bonus: **`Spara i en JSON-fil`** (Save to a JSON file).
+
+In a standard web browser, JavaScript is "sandboxed" for security—it **cannot** reach out and write a file directly to your computer's hard drive. There are two ways your teacher likely intends for you to do this:
+
+* **Option A: The `json-server` (Mock Backend)**: You run a small local server that acts as a database. When you "save," you send a `POST` request to `localhost:3000`, and the server writes it to a `db.json` file for you.
+* **Option B: The "Download" Trick**: You generate a JSON string and "download" it as a file. (This is less likely for a collection app since you'd have to re-upload it every time).
+
+> **Expert Nudge**: If you aren't using a mock server like `json-server`, and `localStorage` is prohibited, your "Single Source of Truth" will only live in the **React State** (the `cards` array) and will disappear when the browser tab closes. Double-check if your teacher provided a "mock-api" or if they just want you to focus on the state logic for now!
+
+### 3. The Quantity Logic (Stacking vs. Adding)
+
+When a user clicks "Add to Collection" on a Pikachu they already own, you don't want two identical Pikachus in your grid. You want **one** Pikachu with an `amount: 2` badge.
+
+**The Logic Flow:**
+
+1. **Check**: Does the `id` of the card I'm adding already exist in the `collection` array?
+2. **If Yes**: Find that card and increment its `amount` property.
+3. **If No**: Push the new card into the array and initialize `amount: 1`.
+
+---
+
+### Your Pre-Flight Checklist for the Next Block
+
+* **[ ]** **The App-Level State**: Since your `DetailedViewPage` and `CollectionPage` both need to talk to the collection, you'll likely need to "lift" the collection state up to your `App.jsx` or a shared Context, similar to how you managed the `notes` array in `NoteTakingApp.jsx`.
+* **[ ]** **The Slam CSS**: Port over the `@keyframes slamIn` and the `.note.animate-in` classes into your Pokémon project's CSS.
+* **[ ]** **The Navigate Trigger**: Use `useNavigate` inside your "Add to Collection" function to teleport the user to the grid after the state updates.
+
+**One final thought on the "Slam":** If the user adds 5 cards in a row, do you want all of them to slam at once when they open the collection, or only the very latest one? 🚀🐋
+
+---
+
+YOU SAID:  
+Wonderful. Let's dive into all of this in the next focus block!
+"One final thought on the "Slam": If the user adds 5 cards in a row, do you want all of them to slam at once when they open the collection, or only the very latest one? 🚀🐋" Hmmm. If there is automatic navigation to the Collection page once a user hits "Add to Collection", *every* time they hit "Add to Collection" on a new card (if a card is in their collection the button will say "Already in Collection", this is impossible, isn't it?
+
+---
+
+GEMINI SAID:  
+You are spot on. With **automatic navigation** acting as a "teleportation" device, the user will experience the cards slamming in one at a time, creating a very rhythmic and satisfying "impact" every time they bring a new Pokémon home.
+
+By navigating the user to the collection immediately, you ensure they see the result of their action—the card landing in its new spot in the grid.
+
+### The Logic of the "One-at-a-Time" Slam
+
+Since you are using the logic from your sticky notes app, the "slam" is triggered by a specific CSS class.
+
+* **The Animation Trigger**: Your `Note.css` defines the `@keyframes slamIn`.
+* **The Conditional Class**: In your `Note.jsx`, the `animate-in` class is only added if `note.isNew` is true.
+* **The Sequence**: When you add a card in `DetailedViewPage`, you will append it to your collection state with `isNew: true`. As soon as the `CollectionPage` renders, that single new card will play its animation while the others stay still.
+
+### The "Already in Collection" Guardrail
+
+You mentioned that a button saying "Already in Collection" would make the "5 in a row" scenario impossible. This is a classic **Derived State** check.
+
+To implement this, your `DetailedViewPage` just needs to look at the "Single Source of Truth" (the collection array) before it renders the button:
+
+* **The Check**: `const isAlreadyOwned = collection.some(c => c.id === card.id);`
+* **The Button UI**:
+* If `isAlreadyOwned` is true, render a disabled button (or a "View in Collection" link).
+* If false, render the active "Add to Collection" button.
+
+
+
+This creates a very robust "guardrail" that prevents duplicate data and keeps your collection clean.
+
+### The `isNew` Lifecycle
+
+There is one small "cleanup" task to handle. If you refresh the page or navigate away and come back, you don't want the cards that are *already* in the collection to "re-slam" every time.
+
+In your `NoteTakingApp.jsx`, you solved this by mapping over the notes on load and setting `isNew: false`. You'll want to do the same for your Pokémon:
+
+* **Initial Load**: When the app starts up and reads the collection, ensure all cards have `isNew: false`.
+* **The "Reset"**: You might even want a small `useEffect` in your `CollectionPage` that sets all `isNew` flags to `false` after a short delay (e.g., 500ms) so the slam only happens once per session.
+
+**Expert Guide Rule 2:** Since we've cleared the air on the "Slam" logic and the "Already in Collection" state, do you want to start the next block by setting up the **Global Collection State** in your `App.jsx` so that all your pages can finally start talking to each other? 🚀🐋
 
 ---

@@ -2,11 +2,11 @@
 * Easter Egg message on `/card`
 * set up persistent state across sessions (write to a JSON file that is read on mount?)
 * If a user searches, then clicks a link to their collection, and then hits the "Back" button in their browser, what should the search bar show?
-* getCardById api function that calls GET /cards/:id
+* getCardById api function that calls GET /cards/:id DONE
 * Loading state integrated on API requests
 * Properly handle the blank /search page
 * debouncing DONE
-* Fix "Objects are not valid" React Error
+* Fix "Objects are not valid" React Error DONE
 * Easter Egg page if the `?page=` value is larger than pagination.total_pages 
 * "Zero Results" state
 
