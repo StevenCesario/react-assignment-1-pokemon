@@ -10,6 +10,7 @@
 * Automatic redirection from Detailed View page to Collection Page when clicked (CREATE)
 * Keep track of card amount for every card in Collection (UPDATE)
 * Implement "Remove from Collection" (DELETE)
+* Make all cards clickable and direct to detailed view page
 * Vibe code CSS for the entire application to make it presentable
 
 If there is time

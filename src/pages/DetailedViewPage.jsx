@@ -57,7 +57,7 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
         navigate('/'); // Redirect to Collection page onClick!
       }
       }>
-        Add to collection
+        {!isAlreadyOwned ? 'Add to Collection!' : 'Already in Collection'}
       </button>
     </div>
   )
