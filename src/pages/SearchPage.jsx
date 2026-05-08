@@ -12,6 +12,9 @@ const SearchPage = () => {
   const [error, setError] = useState(null);
 
   const query = searchParams.get('q'); // The actual results array will be here under the key 'results'
+  // if (!query) {
+  //   setError({message: "No search query!"});
+  // } This is not the way to handle missing search queries haha, it causes an infinite loop. Cleaner code down in the render part of the file
   // These both need to be numbers! Defaults to sensible defaults 1 and 20 if there is nothing present in the URL
   const page = parseInt(searchParams.get('page')) || 1;
   const limit = parseInt(searchParams.get('limit')) || 20;
@@ -79,13 +82,24 @@ const SearchPage = () => {
 
   if (error) return (<p>Error loading page: {error.message}</p>)
 
+  // Here we handle missing search queries! 🚀
+  if (!query) {
+    return (
+      <div>
+        <h2>Looking for Pokémon?</h2>
+        <p>Use the search bar above to find cards to add to your collection!</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <p>Showing results for "{query}" - {pagination.total} total results</p>
       <ul>
         {/* Now we can uncomment this and head over to the Card component to see what data will be unpacked from the card prop */}
         {/* Now wrapped in a Link that sends the user to the Detailed view page, of course with the Backpack strat fully intact haha! 🚀 */}
-        {searchResults.map(result => <Link to={`/card/${result.id}`} state={{ cardData: result }} >< SearchResultItem key={result.id} resultItem={result} /></Link>)}
+        {/* The outermost child is the one that needs the `key` property when using .map() which now with this wrapping is Link! Good to know */}
+        {searchResults.map(result => <Link key={result.id} to={`/card/${result.id}`} state={{ cardData: result }} >< SearchResultItem resultItem={result} /></Link>)}
       </ul>
       {/* The disabled logic.. this needs to be disabled.. if we're on page 1 */}
       <button disabled={pagination.page === 1} onClick={handlePrevPage}>Previous</button>
