@@ -1,64 +1,149 @@
+/* Layout.css */
+
 .search-nav {
-  position: relative;
-  padding-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
+/* Make the "My Collection" link pop as the logo/home button */
+.search-nav > a:first-child {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--primary-blue);
+}
+
+/* --- Disabled Links (Per Handoff) --- */
+.disabled-link {
+  color: #a0a0a0; 
+  cursor: not-allowed; 
+  opacity: 0.7;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.disabled-link:hover {
+  color: #888;
+  animation: tinyShake 0.4s ease-in-out;
+}
+
+@keyframes tinyShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px) rotate(-1deg); }
+  75% { transform: translateX(2px) rotate(1deg); }
+}
+
+/* --- The Search Form --- */
+.search-nav form {
+  margin-left: auto; /* Pushes search to the far right */
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-main);
+  border-radius: 20px;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+  border: 1px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-nav form:focus-within {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: var(--card-bg);
+}
+
+.search-nav input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0.5rem;
+  width: 250px;
+  font-size: 0.95rem;
+}
+
+.search-nav form button {
+  font-size: 1.2rem;
+  padding: 0.25rem 0.5rem;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.search-nav form button:hover {
+  opacity: 1;
+}
+
+/* --- The Goodreads Style Dropdown --- */
 .search-dropdown {
   position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid black;
+  top: calc(100% + 5px);
+  right: 2rem; /* Aligns with the search bar */
+  background: var(--card-bg);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
   z-index: 100;
-  width: 300px;
-  box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+  width: 320px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden; /* Keeps the footer rounding clean */
 }
 
 .dropdown-message {
-  padding: 10px;
+  padding: 1rem;
   margin: 0;
+  color: var(--text-muted);
+  text-align: center;
+  font-size: 0.9rem;
 }
 
 .preview-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .preview-item {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .preview-link {
-  display: block;
-  padding: 10px;
-  text-decoration: none;
-  color: black;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.15s;
+}
+
+.preview-link:hover {
+  background-color: var(--bg-main);
+}
+
+.preview-link strong {
+  color: var(--text-main);
+  font-size: 0.95rem;
 }
 
 .preview-set-name {
-  color: gray;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }
 
 .preview-footer {
-  padding: 10px;
-  background: #f9f9f9;
+  background: #f8fafc;
   text-align: center;
 }
 
 .preview-footer-link {
-  text-decoration: none;
-  font-weight: bold;
+  display: block;
+  padding: 0.75rem;
+  color: var(--primary-blue);
+  font-size: 0.85rem;
+  transition: background-color 0.15s;
 }
 
-.disabled-link {
-  color: #a0a0a0; /* A nice "inactive" gray */
-  cursor: not-allowed; /* Gives the classic red circle-slash cursor! 🚫 */
-  text-decoration: none; /* Optional: removes the underline to further distinguish it */
-  opacity: 0.7;
-}
-
-.disabled-link:hover {
-  /* You can add a slight shake animation or color change here if you want extra vibe! */
-  color: #888;
+.preview-footer-link:hover {
+  background-color: #f1f5f9;
 }

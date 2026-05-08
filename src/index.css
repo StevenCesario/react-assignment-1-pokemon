@@ -1,0 +1,66 @@
+/* index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* TCG App Color Palette */
+  --bg-main: #f4f6f8;        /* Soft gray background for the binder page */
+  --card-bg: #ffffff;        /* Pure white for cards */
+  --text-main: #1a1a2e;
+  --text-muted: #64748b;
+  --primary-blue: #3b82f6;   /* A nice vibrant "Link" blue */
+  --primary-hover: #2563eb;
+  --danger-red: #ef4444;
+  --danger-hover: #dc2626;
+  
+  /* Borders & Shadows */
+  --border-light: #e2e8f0;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Global Reset for Lists & Links */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* --- Global Utilities --- */
+
+/* The pulsing loader requested in the handoff */
+.loader-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin: 2rem 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Global Button Reset for cleaner component styling later */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}

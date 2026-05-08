@@ -1,0 +1,7 @@
+/* App.css */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 80px); /* Accounts for the nav bar height */
+}
