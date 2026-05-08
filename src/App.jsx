@@ -17,8 +17,17 @@ function App() {
     setUserCollection([...userCollection, {...card, amount: 1}]);
   }
 
-  function updateCardInCollection(id) {
-    // To be implemented
+  function increaseAmount(id) {
+    // Loop over the collection items. If the id matches, update the amount value, else just return the item as-is. This is the new userCollection array
+    // setUserCollection(userCollection.map((item, prev) => item.id === id ? {...item, amount: prev.amount + 1} : item)); Attempt 1. Close!
+    // The callback `prev` variable can be named anything! Here we call it prevCollection and *THIS* is the array that we run .map() on!
+    // Permanent brain chemistry altering moment 🚀
+    setUserCollection(prevCollection => prevCollection.map(item => item.id === id ? {...item, amount: item.amount + 1} : item));
+  }
+
+  function decreaseAmount(id) {
+    // Copy paste slightly altering the homework from its sibling above haha
+    setUserCollection(prevCollection => prevCollection.map(item => item.id === id ? {...item, amount: item.amount - 1} : item));
   }
 
   function removeCardFromCollection(id) {
@@ -30,7 +39,7 @@ function App() {
       <Routes>
         {/* The Layout wrapper is a wrapper around all of our page routes! */}
         <Route path='/' element={<Layout />}>
-          <Route index element={<CollectionPage collection={userCollection} />} />
+          <Route index element={<CollectionPage collection={userCollection} onIncrease={increaseAmount} onDecrease={decreaseAmount} />} />
           <Route path='search' element={< SearchPage/>} />
           <Route path='card' element={<EasterEggPage />} />
           <Route path='card/:id' element={<DetailedViewPage collection={userCollection} onAdd={addToCollection} />} />
