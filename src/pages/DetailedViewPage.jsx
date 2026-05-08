@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getCardById, getCardImage } from '../api/api';
-import CardImage from '../components/CardImage';
+// import CardImage from '../components/CardImage'; Didn't end up getting used
+import Card from '../components/Card';
 
 const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about having a boolean isInCollection prop here but that can't be calculated without knowing what card we're looking at via the id that is grabbed here on this page from the URL!
   // const params = useParams(); 
@@ -47,9 +48,13 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
 
   return (
     <div>
-      <h1>{card.card_info.name}</h1>
+      {/* These three lines... */}
+      {/* <h1>{card.card_info.name}</h1>
       <p>Set: {card.card_info.set_name}</p>
-      < CardImage cardId={card.id} cardName={card.card_info.name} />
+      < CardImage cardId={card.id} cardName={card.card_info.name} /> */}
+
+      {/* ...can all be replaced with this haha! I didn't even notice this */}
+      < Card card={card} />
 
       {/* Disabled if the card is already in the collection; no logic clause code needed haha! */}
       <button disabled={isAlreadyOwned} onClick={() => {
