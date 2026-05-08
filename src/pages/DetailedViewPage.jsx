@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { getCardById, getCardImage } from '../api/api';
 // import CardImage from '../components/CardImage'; Didn't end up getting used
 import Card from '../components/Card';
+import './DetailedViewPage.css';
 
 const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about having a boolean isInCollection prop here but that can't be calculated without knowing what card we're looking at via the id that is grabbed here on this page from the URL!
   // const params = useParams(); 
@@ -47,36 +48,42 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
   if (!card) return <p>No card found.</p>;
 
   return (
-    <div>
-      {/* These three lines... */}
-      {/* <h1>{card.card_info.name}</h1>
+    <div className="detailed-view-container">
+      {/* LEFT COLUMN: Card & Main Action */}
+      <div className="detailed-card-visual">
+        {/* These three lines... */}
+        {/* <h1>{card.card_info.name}</h1>
       <p>Set: {card.card_info.set_name}</p>
       < CardImage cardId={card.id} cardName={card.card_info.name} /> */}
 
-      {/* ...can all be replaced with this haha! I didn't even notice this */}
-      < Card card={card} />
+        {/* ...can all be replaced with this haha! I didn't even notice this */}
+        < Card card={card} />
 
-      {/* Disabled if the card is already in the collection; no logic clause code needed haha! */}
-      <button disabled={isAlreadyOwned} onClick={() => {
-        onAdd(card);
-        navigate('/'); // Redirect to Collection page onClick!
-      }
-      }>
-        {!isAlreadyOwned ? 'Add to Collection!' : 'Already in Collection'}
-      </button>
+        {/* Disabled if the card is already in the collection; no logic clause code needed haha! */}
+        <button disabled={isAlreadyOwned} onClick={() => {
+          onAdd(card);
+          navigate('/'); // Redirect to Collection page onClick!
+        }
+        }>
+          {!isAlreadyOwned ? 'Add to Collection!' : 'Already in Collection'}
+        </button>
+      </div>
 
       {/* New pricing data! */}
-      <div>
-        <h3>Want to add it to your real collection?</h3>
-        {/* Now with optional chaining implemented across the board! */}
-        <p>Current TCGPlayer market price: ${card.tcgplayer?.prices?.[0]?.market_price || 'N/A'}</p>
-        {/* Will lead to card.tcgplayer.url */}
-        {/* <button>Buy on tcgplayer.com</button> These are not buttons haha!*/} 
-        {card.tcgplayer?.url ? <a href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a> : <p>TCGPlayer link not available</p>}
-        <p>Average 30 day price on CardMarket.com: ${card.cardmarket?.prices?.[0]?.avg30 || 'N/A'}</p>
-        {/* Will lead to card.cardmarket.product_url */}
-        {/* <button>See card at cardmarket.com</button> */}
-        {card.cardmarket?.product_url ? <a href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a> : <p>CardMarket link not available</p>}
+      {/* RIGHT COLUMN: Pricing Data */}
+      <div className="market-analysis">
+        <div>
+          <h3>Want to add it to your real collection?</h3>
+          {/* Now with optional chaining implemented across the board! */}
+          <p>Current TCGPlayer market price: ${card.tcgplayer?.prices?.[0]?.market_price || 'N/A'}</p>
+          {/* Will lead to card.tcgplayer.url */}
+          {/* <button>Buy on tcgplayer.com</button> These are not buttons haha!*/}
+          {card.tcgplayer?.url ? <a href={card.tcgplayer.url} target="_blank" rel="noopener noreferrer">Buy on tcgplayer.com</a> : <p>TCGPlayer link not available</p>}
+          <p>Average 30 day price on CardMarket.com: ${card.cardmarket?.prices?.[0]?.avg30 || 'N/A'}</p>
+          {/* Will lead to card.cardmarket.product_url */}
+          {/* <button>See card at cardmarket.com</button> */}
+          {card.cardmarket?.product_url ? <a href={card.cardmarket.product_url} target="_blank" rel="noopener noreferrer">See card at cardmarket.com</a> : <p>CardMarket link not available</p>}
+        </div>
       </div>
     </div>
   )

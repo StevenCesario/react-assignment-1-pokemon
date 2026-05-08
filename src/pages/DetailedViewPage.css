@@ -1,0 +1,115 @@
+/* DetailedViewPage.css */
+
+.detailed-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  background: var(--card-bg);
+  padding: 3rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* On desktop, switch to a side-by-side layout! */
+@media (min-width: 768px) {
+  .detailed-view-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* --- Left Column: Card & Button --- */
+.detailed-card-visual {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.add-to-collection-btn {
+  width: 100%;
+  max-width: 250px;
+  background-color: var(--primary-blue);
+  color: white;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s, transform 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.add-to-collection-btn:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.add-to-collection-btn:disabled {
+  background-color: var(--bg-main);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border: 1px solid var(--border-light);
+  box-shadow: none;
+}
+
+/* --- Right Column: Market Analysis --- */
+.market-analysis {
+  flex: 1.5;
+  background: var(--bg-main);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+}
+
+.market-analysis h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  color: var(--text-main);
+  border-bottom: 2px solid var(--border-light);
+  padding-bottom: 0.75rem;
+}
+
+.market-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.market-stat span {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #10b981; /* A nice "money" green */
+}
+
+/* Style the <a> tags to look like sleek secondary buttons */
+.external-link-btn {
+  display: block;
+  text-align: center;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem; /* Spacing between the two market chunks */
+  transition: all 0.2s;
+}
+
+.external-link-btn:last-child {
+  margin-bottom: 0;
+}
+
+.external-link-btn:hover {
+  border-color: var(--text-muted);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
