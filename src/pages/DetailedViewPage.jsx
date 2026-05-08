@@ -51,8 +51,8 @@ const DetailedViewPage = ({ collection, onAdd }) => { // I first thought about h
       <p>Set: {card.card_info.set_name}</p>
       < CardImage cardId={card.id} cardName={card.card_info.name} />
 
-      {/* Will eventually be dynamically rendered with {isInCollection? 'Add to Collection' : 'Already in Collection'} */}
-      <button onClick={() => {
+      {/* Disabled if the card is already in the collection; no logic clause code needed haha! */}
+      <button disabled={isAlreadyOwned} onClick={() => {
         onAdd(card);
         navigate('/'); // Redirect to Collection page onClick!
       }
