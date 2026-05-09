@@ -8,7 +8,7 @@ Finns tillgänglig på https://stevencesario.github.io/react-assignment-1-pokemo
 För det första; ja, alla commits har gjorts direkt till main och det är ganska kaos i commitsen all in all hahaha.  
 Jag har prioriterat att koda så mycket som möjligt från intuition, förstå och lära mig allt nytt och ha så kul som möjligt. Och detta vill jag säga att jag lyckats bra med!  
 Myyyycket tid lades i början på Router-arkitekturen och att förstå det. Och det blev även en grej som itererades på under hela projektets gång.  
-Den andra grejen som mycket tid lades ner på var sökfunktionaliteten. Jag gjorde även en pivot här, från automatic navigation med useEffect() till en Goodreads style dropdown med de 5 första sökresultaten. Debouncing var essential för att jag inte skulle bränna igenom requests då jag endast kunde göra 100 requests per timme.  
+Den andra grejen som mycket tid lades ner på var sökfunktionaliteten. Jag gjorde även en pivot här, från automatic navigation med useEffect() till en Goodreads style dropdown med de 5 första sökresultaten. Debouncing var essential för att jag inte skulle bränna igenom requests då jag endast kunde göra 100 requests per timme. För detta används `useTimeout()` i en `useEffect()` för att vänta 500ms efter att användaren har slutat skriva tills API-anropet körs.   
 Hela projektets Gemini chat historik finns i [Build Logs](build-logs.md).  
 
 Några av de allra största brain chemistry altering moments under projektets gång:  
